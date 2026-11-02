@@ -24,4 +24,24 @@ class MartianRobotsTest : FunSpec({
 
         MartianRobots.run(input) shouldBe expected
     }
+
+    test("scents accumulate across robots") {
+        val input = """
+            5 3
+            2 3 N
+            F
+            4 3 N
+            F
+            2 3 N
+            FRFFLF
+        """.trimIndent()
+
+        val expected = """
+            2 3 N LOST
+            4 3 N LOST
+            4 3 N
+        """.trimIndent()
+
+        MartianRobots.run(input) shouldBe expected
+    }
 })

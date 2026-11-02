@@ -12,6 +12,8 @@ kotlin {
 }
 
 dependencies {
+    implementation(libs.kotlinx.collections.immutable)
+
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
 }
@@ -22,4 +24,8 @@ application {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
 }
