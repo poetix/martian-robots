@@ -219,8 +219,8 @@ with no instructions. A final line terminator does not start another line, so
 ### 9. Size limits belong to the input format, not the domain
 
 The brief caps coordinates at 50 and instruction strings at under 100
-characters. `InputParser` enforces both, as `MAX_COORDINATE = 50` and
-`MAX_INSTRUCTION_LENGTH = 99`. The domain types (`Position`, `GridBounds`,
+characters. The parser enforces both, in `LineParser`, as `MAX_COORDINATE = 50`
+and `MAX_INSTRUCTION_LENGTH = 99`. The domain types (`Position`, `GridBounds`,
 `RobotState`, `RobotProgram`, `WorldState`) have no size limits and do not
 check them. We could instead have made the domain refuse to represent anything
 larger, for example by having `RobotProgram` or `GridBounds` reject such values
@@ -234,7 +234,7 @@ future rule change that raises or removes the limits.
 
 > In the context of **the brief's input limits (coordinates ≤ 50, instructions
 > < 100 characters)**, facing **the choice of where to enforce them**, we
-> decided for **checking them in `InputParser` only** and neglected **refusing
+> decided for **checking them in the parser only** and neglected **refusing
 > to construct `GridBounds`, `Position` or `RobotProgram` values beyond them**,
 > to achieve **a domain that models movement, loss and scent at any size, with
 > the limits kept alongside the input format they describe**, accepting **that

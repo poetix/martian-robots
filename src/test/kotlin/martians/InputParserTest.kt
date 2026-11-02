@@ -2,77 +2,14 @@ package martians
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldStartWith
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import martians.Orientation.E
-import martians.Orientation.N
 import martians.Orientation.W
 
 class InputParserTest : FunSpec({
 
     val parser = InputParser()
-
-    context("grid bounds") {
-        test("upper-right coordinates give bounds from 0 0") {
-            parser.parseBounds("5 3") shouldBe GridBounds(0 at 0, 5 at 3)
-        }
-
-        test("largest coordinate is 50") {
-            parser.parseBounds("50 50") shouldBe GridBounds(0 at 0, 50 at 50)
-        }
-
-        withData(
-            nameFn = { "rejects '$it'" },
-            "", "5", "5 3 1", "a 3", "-1 3", "51 3", "5 51",
-        ) { line ->
-            shouldThrow<InputException> { parser.parseBounds(line) }
-        }
-    }
-
-    context("robot position") {
-        test("coordinates and orientation") {
-            parser.parseRobotState("1 2 E") shouldBe RobotState(1 at 2, E)
-        }
-
-        test("any whitespace separates fields") {
-            parser.parseRobotState("  3\t2   N ") shouldBe RobotState(3 at 2, N)
-        }
-
-        withData(
-            nameFn = { "rejects '$it'" },
-            "", "1 2", "1 2 E E", "1 2 X", "1 2 n", "x 2 N", "1 51 N",
-        ) { line ->
-            shouldThrow<InputException> { parser.parseRobotState(line) }
-        }
-    }
-
-    context("instructions") {
-        test("each letter becomes a command") {
-            parser.parseCommands("LRF") shouldBe listOf(TurnLeft, TurnRight, Forward)
-        }
-
-        test("an empty line is no commands") {
-            parser.parseCommands("") shouldBe emptyList()
-        }
-
-        test("99 instructions are accepted") {
-            parser.parseCommands("F".repeat(99)).size shouldBe 99
-        }
-
-        withData(
-            nameFn = { "rejects '${it.take(10)}...' (${it.length} chars)" },
-            "F".repeat(100), "LXF", "lrf", "L F",
-        ) { line ->
-            shouldThrow<InputException> { parser.parseCommands(line) }
-        }
-
-        test("further command types can be supplied") {
-            val backward = Command { it }
-            InputParser(standardCommands + ('B' to backward)).parseCommands("FB") shouldBe listOf(Forward, backward)
-        }
-    }
 
     context("streaming") {
         test("the consumer's result is returned") {
@@ -90,7 +27,6 @@ class InputParserTest : FunSpec({
             val lines = sequenceOf("5 3", "1 1 E", "F", "1 1 Q", "F")
             parser.parse(lines) { _, programs -> programs.first().start } shouldBe RobotState(1 at 1, E)
             shouldThrow<InputException> { parser.parse(lines) { _, programs -> programs.toList() } }
-                .message shouldStartWith "Line 4:"
         }
 
         test("robots can be consumed only once") {
@@ -119,15 +55,20 @@ class InputParserTest : FunSpec({
             parser.parse("5 3\r\n1 1 E\r\nRF\r\n").robots.size shouldBe 1
         }
 
-        withData(
-            nameFn = { (input, error) -> "'${input.replace("\n", "\\n")}' fails with '$error'" },
-            "" to "Line 1:",
-            "5 3\n1 1 E" to "Line 2: robot position has no instruction line",
-            "5 3\n6 1 E\nF" to "Line 2: robot starts at 6 1, outside the grid",
-            "5 3\n1 1 E\nF\n1 1 Q\nF" to "Line 4:",
-            "5 3\n1 1 E\nFXF" to "Line 3:",
-        ) { (input, error) ->
-            shouldThrow<InputException> { parser.parse(input) }.message shouldStartWith error
+        test("empty input is missing its grid line") {
+            shouldThrow<InputException> { parser.parse("") }
+                .message shouldBe "Line 1: Expected grid size but reached end of input"
+        }
+
+        test("a final line terminator does not start an empty instruction line") {
+            shouldThrow<InputException> { parser.parse("5 3\n1 1 E\n") }
+                .message shouldBe "Line 3: Expected robot instructions but reached end of input"
+        }
+
+        test("further command types are passed through to line parsing") {
+            val backward = Command { it }
+            InputParser(standardCommands + ('B' to backward)).parse("5 3\n1 1 E\nFB").robots.single().commands shouldBe
+                listOf(Forward, backward)
         }
     }
 })

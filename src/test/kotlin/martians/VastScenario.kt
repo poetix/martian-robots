@@ -20,7 +20,7 @@ class VastScenario(size: Int, val robotCount: Int, seed: Long = 42) {
         return List(robotCount) {
             val start = generateSequence { random.nextInt(size) at random.nextInt(size) }.first(safeSquares::isSafe)
             val orientation = Orientation.entries.random(random)
-            val commands = List(random.nextInt(1, InputParser.MAX_INSTRUCTION_LENGTH + 1)) {
+            val commands = List(random.nextInt(1, LineParser.MAX_INSTRUCTION_LENGTH + 1)) {
                 standardCommands.getValue(letters.random(random))
             }
             RobotProgram(RobotState(start, orientation), commands)
