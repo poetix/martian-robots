@@ -22,7 +22,7 @@ data object Forward : Command {
         when {
             safeSquares.isSafe(moved.position) -> copy(robot = moved)
             robot.position in scents -> this
-            else -> copy(robot = robot.copy(isLost = true), scents = scents.add(robot.position))
+            else -> copy(robot = robot.copy(isLost = true), scents = scents.adding(robot.position))
         }
     }
 }

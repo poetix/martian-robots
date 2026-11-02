@@ -112,11 +112,11 @@ to `Forward`.
 ### 5. Scents are a persistent set
 
 `scents` is a `PersistentSet<Position>` from `kotlinx-collections-immutable`.
-`Forward` records a scent with `scents.add(position)`, which costs O(log n) and
-shares structure with the previous world. We call `add` explicitly. Without an
-extra import, `scents + position` resolves to the standard library's `plus`,
-which copies the whole set into a plain `Set`; the compiler catches the type
-mismatch, but `add` makes the intent plain.
+`Forward` records a scent with `scents.adding(position)`, which costs O(log n)
+and shares structure with the previous world. We call `adding` explicitly.
+Without an extra import, `scents + position` resolves to the standard library's
+`plus`, which copies the whole set into a plain `Set`; the compiler catches the
+type mismatch, but `adding` makes the intent plain.
 
 Under the original rules scents are few: at most one per lost robot, and only
 on edge points. The choice is driven by the plausible follow-up rule "leave a

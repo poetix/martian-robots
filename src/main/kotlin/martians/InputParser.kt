@@ -57,7 +57,7 @@ class InputParser(private val commands: Map<Char, Command> = standardCommands) {
     }
 
     private fun fields(line: String, expected: Int, description: String): List<String> {
-        val fields = line.trim().split(WHITESPACE).filter { it.isNotEmpty() }
+        val fields = line.trim().split(WHITESPACE)
         if (fields.size != expected) throw InputException("Expected $description but got '$line'")
         return fields
     }
