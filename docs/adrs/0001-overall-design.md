@@ -149,15 +149,27 @@ The sample input does not test the difference.
 > representation**, accepting **that a different reading would change
 > `scents` to hold (position, orientation) pairs**.
 
-### 7. Parsing yields programs; the runner assembles worlds
+### 7. Parsing streams programs; the runner assembles worlds
 
-`InputParser.parse(input)` returns `Mission(bounds, robots)`. Each robot is a
-`RobotProgram(start: RobotState, commands: List<Command>)`. A pair of input
-lines cannot produce a `WorldState` on its own, because the world also needs
-the bounds and the scents left by earlier robots. `MartianRobots.run` builds
-each world from the robot's program, the bounds and the scents so far, runs it,
-and passes the resulting scents to the next robot. `RobotState.report()`
-formats the result as `x y O` or `x y O LOST`.
+`InputParser.parse(lines: Sequence<String>, consume)` reads the grid from the
+first line. It then calls `consume(bounds, programs)` and returns its result.
+`programs` is a lazy, single-use `Sequence<RobotProgram>`: a robot's two lines
+are read and parsed only when the consumer asks for that robot. Each robot is a
+`RobotProgram(start: RobotState, commands: List<Command>)`.
+
+A pair of input lines cannot produce a `WorldState` on its own, because the
+world also needs the bounds and the scents left by earlier robots.
+`MartianRobots.execute` lazily builds each world from the robot's program, the
+bounds and the scents so far. It runs the world and passes the resulting scents
+to the next robot. `RobotState.report()` formats the result as `x y O` or
+`x y O LOST`.
+
+The command-line program streams standard input through all three stages. Each
+report is printed before the next robot's lines are read, so memory use does
+not grow with the number of robots. Five million robots run in a 32 MB heap.
+`InputParser.parse(input: String): Mission` and
+`MartianRobots.run(input: String): String` read everything into memory, for
+tests and small inputs.
 
 > In the context of **turning text into worlds**, facing **the fact that a
 > robot's world depends on the robots before it**, we decided for **the parser
@@ -167,7 +179,16 @@ formats the result as `x y O` or `x y O LOST`.
 > place where scents flow from robot to robot**, accepting **a small
 > `Mission`/`RobotProgram` layer between parsing and execution**.
 
-### 8. Invalid input fails the whole run, with a line number
+> In the context of **inputs that may hold very many robots**, facing **memory
+> that grows with the input if it is read whole**, we decided for **the parser
+> handing a lazy, single-use sequence of programs to a caller-supplied
+> consumer** and neglected **returning a fully built `Mission`, and returning
+> a lazy sequence that outlives the parse call**, to achieve **constant-memory
+> streaming from input lines to output reports, with the consumer deciding
+> whether to stream or collect**, accepting **that input errors surface partway
+> through consumption rather than before any robot runs**.
+
+### 8. Invalid input stops the run, with a line number
 
 The parser rejects the following with an `InputException` whose message starts
 `Line N:`:
@@ -179,17 +200,21 @@ The parser rejects the following with an `InputException` whose message starts
 - robots starting on an unsafe square;
 - a position line with no instruction line after it.
 
-`main` prints the message to stderr and exits with status 1. An empty
-instruction line is a robot with no instructions. A single trailing line
-terminator is ignored, so `...\n1 1 E\n` is a missing instruction line, not an
-empty one. Both `\n` and `\r\n` are accepted.
+`main` prints the message to stderr and exits with status 1. Because input is
+streamed (§7), robots before the bad line have already been reported to stdout
+by then. Nothing after it is reported. An empty instruction line is a robot
+with no instructions. A final line terminator does not start another line, so
+`...\n1 1 E\n` is a missing instruction line, not an empty one. Both `\n` and
+`\r\n` are accepted.
 
 > In the context of **input from Earth**, facing **malformed or out-of-range
-> lines**, we decided for **strict validation that fails the whole run with a
-> line-numbered message** and neglected **skipping bad robots, and accepting
-> lower-case letters or out-of-range values**, to achieve **no silent
-> misbehaviour and errors that point at the offending line**, accepting **that
-> one bad robot stops the robots that follow it from being reported**.
+> lines**, we decided for **strict validation that stops the run with a
+> line-numbered message and a failing exit status** and neglected **skipping
+> bad robots, and accepting lower-case letters or out-of-range values**, to
+> achieve **no silent misbehaviour and errors that point at the offending
+> line**, accepting **that one bad robot stops the robots that follow it from
+> being reported, and that a failed run may already have printed some
+> reports**.
 
 ### 9. Size limits belong to the input format, not the domain
 
@@ -239,8 +264,6 @@ future rule change that raises or removes the limits.
 - Multi-letter or parameterised commands: the input format has none.
 - Per-direction scents, terrain beyond the rectangle, scent-propagation rules:
   the extension points exist, the rules do not.
-- Streaming input for very large missions: the whole input is read into
-  memory.
 
 ## Alternatives considered
 

@@ -8,11 +8,13 @@ fun main() {
     exitProcess(runCli(System.`in`, System.out, System.err))
 }
 
-/** Reads the whole of [input], writes one report line per robot to [out], and returns the process exit status. */
+/**
+ * Streams [input] line by line, writing each robot's report to [out] as soon as it is known, and returns the process
+ * exit status. On invalid input, robots before the bad line have already been reported.
+ */
 fun runCli(input: InputStream, out: PrintStream, err: PrintStream): Int =
     try {
-        val output = MartianRobots.run(input.bufferedReader().readText())
-        if (output.isNotEmpty()) out.println(output)
+        input.bufferedReader().useLines { lines -> MartianRobots.run(lines, emit = out::println) }
         0
     } catch (e: InputException) {
         err.println("Invalid input: ${e.message}")

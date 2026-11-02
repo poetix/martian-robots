@@ -124,6 +124,10 @@ Notes:
 
 ## Recommendations
 
+> **Status:** recommendation 1 was applied in commit `7ab4340`. Recommendation 3
+> was applied afterwards: input is now streamed (ADR 0001 §7). The
+> recommendations below are unchanged, as written at the time of measurement.
+
 1. **Use `persistentHashSetOf` for scents (A).** It is a two-line change with no
    design impact.
 2. **Run robots in parallel and re-run only those that hit a scent.** A robot's

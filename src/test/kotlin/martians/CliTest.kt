@@ -25,6 +25,11 @@ class CliTest : FunSpec({
         cli("5 3\n") shouldBe Result(0, "", "")
     }
 
+    test("robots before an invalid line are still reported before the error") {
+        cli("5 3\n1 1 E\nRFRFRFRF\n1 1 Q\nF\n") shouldBe
+            Result(1, "1 1 E\n", "Invalid input: Line 4: 'Q' is not an orientation; expected one of N, E, S, W\n")
+    }
+
     test("invalid input prints the error to stderr and exits 1") {
         cli("5 3\n9 9 N\nF\n") shouldBe
             Result(1, "", "Invalid input: Line 2: robot starts at 9 9, outside the grid\n")

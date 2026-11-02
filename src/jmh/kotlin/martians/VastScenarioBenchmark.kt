@@ -38,5 +38,5 @@ open class VastScenarioBenchmark {
     }
 
     @Benchmark
-    fun execute(): List<RobotState> = MartianRobots.execute(scenario.programs, scenario.safeSquares)
+    fun execute(): List<RobotState> = MartianRobots.execute(scenario.programs.asSequence(), scenario.safeSquares).toList()
 }

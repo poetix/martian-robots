@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
+import io.kotest.matchers.types.shouldBeSameInstanceAs
 import martians.Orientation.E
 import martians.Orientation.N
 import martians.Orientation.W
@@ -70,6 +71,32 @@ class InputParserTest : FunSpec({
         test("further command types can be supplied") {
             val backward = Command { it }
             InputParser(standardCommands + ('B' to backward)).parseCommands("FB") shouldBe listOf(Forward, backward)
+        }
+    }
+
+    context("streaming") {
+        test("the consumer's result is returned") {
+            val result = Any()
+            parser.parse(sequenceOf("5 3")) { _, _ -> result } shouldBeSameInstanceAs result
+        }
+
+        test("robots are read only as far as the consumer asks, so input may be unbounded") {
+            val endless = sequenceOf("5 3") + generateSequence { "1 1 E" }.flatMap { sequenceOf(it, "F") }
+            parser.parse(endless) { _, programs -> programs.take(2).toList() } shouldBe
+                List(2) { RobotProgram(RobotState(1 at 1, E), listOf(Forward)) }
+        }
+
+        test("an error in a later robot surfaces only when that robot is reached") {
+            val lines = sequenceOf("5 3", "1 1 E", "F", "1 1 Q", "F")
+            parser.parse(lines) { _, programs -> programs.first().start } shouldBe RobotState(1 at 1, E)
+            shouldThrow<InputException> { parser.parse(lines) { _, programs -> programs.toList() } }
+                .message shouldStartWith "Line 4:"
+        }
+
+        test("robots can be consumed only once") {
+            shouldThrow<IllegalStateException> {
+                parser.parse(sequenceOf("5 3", "1 1 E", "F")) { _, programs -> programs.toList() + programs.toList() }
+            }
         }
     }
 

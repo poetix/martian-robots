@@ -8,29 +8,44 @@ data class Mission(val bounds: GridBounds, val robots: List<RobotProgram>)
 
 /**
  * Parses the problem input: a grid line, then a position line and an instruction line per robot.
- * A trailing line terminator is ignored; an empty instruction line means a robot with no instructions.
+ * An empty instruction line means a robot with no instructions.
  */
 class InputParser(private val commands: Map<Char, Command> = standardCommands) {
 
-    fun parse(input: String): Mission {
-        val lines = input.lines().let { if (it.size > 1 && it.last().isEmpty()) it.dropLast(1) else it }
-        val bounds = atLine(1) { parseBounds(lines.first()) }
+    /**
+     * Reads the grid from the first of [lines], then hands it to [consume] with the robots as a lazy, single-use
+     * sequence: each robot's lines are read and parsed only when the consumer asks for it, so input of any length
+     * can be processed in constant memory. Errors in a robot's lines surface when that robot is reached.
+     */
+    fun <T> parse(lines: Sequence<String>, consume: (GridBounds, Sequence<RobotProgram>) -> T): T {
+        val iterator = lines.iterator()
+        val bounds = atLine(1) { parseBounds(if (iterator.hasNext()) iterator.next() else "") }
 
-        val robotLines = lines.drop(1)
-        if (robotLines.size % 2 != 0) {
-            throw InputException("Line ${lines.size}: robot position has no instruction line after it")
-        }
-
-        val robots = robotLines.chunked(2).mapIndexed { index, (positionLine, instructionLine) ->
-            val lineNumber = 2 + 2 * index
-            val start = atLine(lineNumber) { parseRobotState(positionLine) }
-            if (!bounds.isSafe(start.position)) {
-                val (x, y) = start.position
-                throw InputException("Line $lineNumber: robot starts at $x $y, outside the grid")
+        val programs = sequence {
+            var lineNumber = 2
+            while (iterator.hasNext()) {
+                val positionLine = iterator.next()
+                if (!iterator.hasNext()) {
+                    throw InputException("Line $lineNumber: robot position has no instruction line after it")
+                }
+                yield(parseProgram(bounds, positionLine, iterator.next(), lineNumber))
+                lineNumber += 2
             }
-            RobotProgram(start, atLine(lineNumber + 1) { parseCommands(instructionLine) })
+        }.constrainOnce()
+
+        return consume(bounds, programs)
+    }
+
+    /** Parses the whole of [input] into memory. */
+    fun parse(input: String): Mission = parse(input.inputLines()) { bounds, programs -> Mission(bounds, programs.toList()) }
+
+    private fun parseProgram(bounds: GridBounds, positionLine: String, instructionLine: String, lineNumber: Int): RobotProgram {
+        val start = atLine(lineNumber) { parseRobotState(positionLine) }
+        if (!bounds.isSafe(start.position)) {
+            val (x, y) = start.position
+            throw InputException("Line $lineNumber: robot starts at $x $y, outside the grid")
         }
-        return Mission(bounds, robots)
+        return RobotProgram(start, atLine(lineNumber + 1) { parseCommands(instructionLine) })
     }
 
     fun parseBounds(line: String): GridBounds {
@@ -81,3 +96,7 @@ class InputParser(private val commands: Map<Char, Command> = standardCommands) {
         private val WHITESPACE = Regex("\\s+")
     }
 }
+
+/** The lines of [this] text, ignoring a single trailing line terminator as a line reader would. */
+fun String.inputLines(): Sequence<String> =
+    lines().let { if (it.size > 1 && it.last().isEmpty()) it.dropLast(1) else it }.asSequence()

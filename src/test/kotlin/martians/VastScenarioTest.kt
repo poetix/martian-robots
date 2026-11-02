@@ -8,7 +8,7 @@ import io.kotest.matchers.shouldBe
 class VastScenarioTest : FunSpec({
 
     val scenario = VastScenario(size = 1_000, robotCount = 10_000)
-    val finished = MartianRobots.execute(scenario.programs, scenario.safeSquares)
+    val finished = MartianRobots.execute(scenario.programs.asSequence(), scenario.safeSquares).toList()
 
     test("about one point in sixteen is a hole") {
         val sample = (0 until 400).flatMap { x -> (0 until 400).map { y -> x at y } }
@@ -25,6 +25,6 @@ class VastScenarioTest : FunSpec({
 
     test("the same seed gives the same outcome") {
         val again = VastScenario(size = 1_000, robotCount = 10_000)
-        MartianRobots.execute(again.programs, again.safeSquares) shouldBe finished
+        MartianRobots.execute(again.programs.asSequence(), again.safeSquares).toList() shouldBe finished
     }
 })
