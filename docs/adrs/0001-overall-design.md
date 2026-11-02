@@ -191,6 +191,31 @@ empty one. Both `\n` and `\r\n` are accepted.
 > misbehaviour and errors that point at the offending line**, accepting **that
 > one bad robot stops the robots that follow it from being reported**.
 
+### 9. Size limits belong to the input format, not the domain
+
+The brief caps coordinates at 50 and instruction strings at under 100
+characters. `InputParser` enforces both, as `MAX_COORDINATE = 50` and
+`MAX_INSTRUCTION_LENGTH = 99`. The domain types (`Position`, `GridBounds`,
+`RobotState`, `RobotProgram`, `WorldState`) have no size limits and do not
+check them. We could instead have made the domain refuse to represent anything
+larger, for example by having `RobotProgram` or `GridBounds` reject such values
+when constructed. We chose not to.
+
+The limits describe what Earth will send, not how robots behave on Mars. No
+rule of movement, loss or scent depends on 50 or 99. Keeping the domain
+unbounded is what lets [benchmark 0001](../benchmarks/0001-vast-scenario.md)
+build a field a billion points across directly. It also leaves room for a
+future rule change that raises or removes the limits.
+
+> In the context of **the brief's input limits (coordinates ≤ 50, instructions
+> < 100 characters)**, facing **the choice of where to enforce them**, we
+> decided for **checking them in `InputParser` only** and neglected **refusing
+> to construct `GridBounds`, `Position` or `RobotProgram` values beyond them**,
+> to achieve **a domain that models movement, loss and scent at any size, with
+> the limits kept alongside the input format they describe**, accepting **that
+> code constructing domain objects directly, such as tests and benchmarks, is
+> not held to the brief's limits**.
+
 ## Consequences
 
 **Positive**
