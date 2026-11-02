@@ -1,15 +1,23 @@
-package martians
+package martians.parsing
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
-import martians.Orientation.E
-import martians.Orientation.W
+import martians.Forward
+import martians.TurnRight
+import martians.at
+import martians.domain.Command
+import martians.domain.GridBounds
+import martians.domain.Orientation.E
+import martians.domain.Orientation.W
+import martians.domain.RobotProgram
+import martians.domain.RobotState
+import martians.standardCommands
 
 class InputParserTest : FunSpec({
 
-    val parser = InputParser()
+    val parser = InputParser(standardCommands::get)
 
     context("streaming") {
         test("the consumer's result is returned") {
@@ -65,10 +73,10 @@ class InputParserTest : FunSpec({
                 .message shouldBe "Line 3: Expected robot instructions but reached end of input"
         }
 
-        test("further command types are passed through to line parsing") {
+        test("the command resolver is used for instruction letters") {
             val backward = Command { it }
-            InputParser(standardCommands + ('B' to backward)).parse("5 3\n1 1 E\nFB").robots.single().commands shouldBe
-                listOf(Forward, backward)
+            val resolver = { letter: Char -> if (letter == 'B') backward else standardCommands[letter] }
+            InputParser(resolver).parse("5 3\n1 1 E\nFB").robots.single().commands shouldBe listOf(Forward, backward)
         }
     }
 })

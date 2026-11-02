@@ -65,19 +65,27 @@ compared by value equality.
 > and testable as before/after values**, accepting **one allocated world per
 > command executed**.
 
-### 2. Instruction letters map to commands through a replaceable table
+### 2. Instruction letters resolve to commands through an injected function
 
 `standardCommands: Map<Char, Command>` maps `L`, `R` and `F` to their commands.
-`InputParser` takes the map as a constructor parameter, with the standard map
-as its default. Adding a command type means writing a new `Command` and adding
-an entry; neither the parser nor the runner changes.
+The parser, in package `martians.parsing`, does not see the map. `InputParser`
+takes a `commandResolver: (Char) -> Command?` with no default, and the
+application supplies `standardCommands::get`. Adding a command type means
+writing a new `Command` and adding a map entry; neither the parser nor the
+runner changes.
+
+Because the parser sees only a function, an unknown letter's error names the
+letter but cannot list the valid ones.
 
 > In the context of **parsing instruction strings**, facing **the brief's
-> warning that new command types will arrive**, we decided for **a letter →
-> `Command` map injected into the parser** and neglected **a hard-coded `when`
-> in the parser, and a plugin or service-loader mechanism**, to achieve **new
-> commands added in one place with no parser change**, accepting **that
-> commands are limited to single letters until the input format changes**.
+> warning that new command types will arrive**, we decided for **a
+> `(Char) -> Command?` resolver passed explicitly to the parser** and neglected
+> **a hard-coded `when` in the parser, a `Map` parameter with the standard
+> commands as its default, and a plugin or service-loader mechanism**, to
+> achieve **new commands added in one place with no parser change, and a parser
+> that depends only on how letters are looked up, not where commands come
+> from**, accepting **that commands are limited to single letters until the
+> input format changes, and that errors cannot list the valid letters**.
 
 ### 3. Losing a robot stops execution in one place
 

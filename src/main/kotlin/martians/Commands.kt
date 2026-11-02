@@ -1,8 +1,8 @@
 package martians
 
-fun interface Command {
-    fun execute(world: WorldState): WorldState
-}
+import martians.domain.Command
+import martians.domain.RobotState
+import martians.domain.WorldState
 
 data object TurnLeft : Command {
     override fun execute(world: WorldState) = world.updateRobot(RobotState::turnedLeft)

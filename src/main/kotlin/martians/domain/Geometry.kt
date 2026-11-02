@@ -1,4 +1,4 @@
-package martians
+package martians.domain
 
 data class Position(val x: Int, val y: Int) {
     fun moved(orientation: Orientation): Position =

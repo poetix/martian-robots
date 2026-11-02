@@ -1,4 +1,11 @@
-package martians
+package martians.parsing
+
+import martians.domain.Command
+import martians.domain.GridBounds
+import martians.domain.Orientation
+import martians.domain.Position
+import martians.domain.RobotProgram
+import martians.domain.RobotState
 
 /**
  * Takes input lines one at a time, numbering them so that every failure can say which line it is on.
@@ -6,7 +13,7 @@ package martians
  */
 internal class LineParser(
     private val iterator: Iterator<String>,
-    private val commands: Map<Char, Command> = standardCommands,
+    private val commandResolver: (Char) -> Command?,
 ) {
     private var lineNumber = 0
 
@@ -45,9 +52,7 @@ internal class LineParser(
                 fail("Instructions are ${line.length} characters; at most $MAX_INSTRUCTION_LENGTH allowed")
             }
             line.map { letter ->
-                commands[letter] ?: fail(
-                    "'$letter' is not a known instruction; expected one of ${commands.keys.joinToString(", ")}"
-                )
+                commandResolver(letter) ?: fail("'$letter' is not a known instruction")
             }
         }
 

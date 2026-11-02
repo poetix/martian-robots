@@ -1,5 +1,6 @@
 package martians
 
+import martians.parsing.InputException
 import java.io.InputStream
 import java.io.PrintStream
 import kotlin.system.exitProcess

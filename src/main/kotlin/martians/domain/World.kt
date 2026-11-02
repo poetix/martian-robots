@@ -1,4 +1,4 @@
-package martians
+package martians.domain
 
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentHashSetOf
@@ -15,6 +15,9 @@ data class RobotState(
 
     fun turnedRight(): RobotState = copy(orientation = orientation.right())
 }
+
+/** A robot's starting state and the commands it is to execute. */
+data class RobotProgram(val start: RobotState, val commands: List<Command>)
 
 /**
  * Everything a command can see or change: the current robot, where it is safe to go, and scents left so far.

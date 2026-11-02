@@ -1,13 +1,15 @@
-package martians
+package martians.domain
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
-import martians.Orientation.E
-import martians.Orientation.N
-import martians.Orientation.S
-import martians.Orientation.W
+import martians.at
+import martians.domain.Orientation.E
+import martians.domain.Orientation.N
+import martians.domain.Orientation.S
+import martians.domain.Orientation.W
+import martians.grid5x3
 
 class GeometryTest : FunSpec({
 

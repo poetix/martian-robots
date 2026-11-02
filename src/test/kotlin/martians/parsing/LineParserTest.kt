@@ -1,15 +1,25 @@
-package martians
+package martians.parsing
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
-import martians.Orientation.E
-import martians.Orientation.N
+import martians.Forward
+import martians.TurnLeft
+import martians.TurnRight
+import martians.at
+import martians.domain.Command
+import martians.domain.GridBounds
+import martians.domain.Orientation.E
+import martians.domain.Orientation.N
+import martians.domain.RobotProgram
+import martians.domain.RobotState
+import martians.grid5x3
+import martians.standardCommands
 
 class LineParserTest : FunSpec({
 
-    fun parsing(vararg lines: String) = LineParser(lines.iterator())
+    fun parsing(vararg lines: String) = LineParser(lines.iterator(), standardCommands::get)
 
     context("grid bounds") {
         test("upper-right coordinates give bounds from 0 0") {
@@ -65,10 +75,15 @@ class LineParserTest : FunSpec({
             shouldThrow<InputException> { parsing(line).parseInstructions() }
         }
 
-        test("letters are looked up in the command set supplied") {
+        test("letters are looked up with the command resolver supplied") {
             val backward = Command { it }
-            LineParser(listOf("FB").iterator(), standardCommands + ('B' to backward)).parseInstructions() shouldBe
-                listOf(Forward, backward)
+            val resolver = { letter: Char -> if (letter == 'B') backward else standardCommands[letter] }
+            LineParser(listOf("FB").iterator(), resolver).parseInstructions() shouldBe listOf(Forward, backward)
+        }
+
+        test("a letter the resolver does not know is rejected, naming the letter") {
+            shouldThrow<InputException> { parsing("LXF").parseInstructions() }
+                .message shouldBe "Line 1: 'X' is not a known instruction"
         }
     }
 

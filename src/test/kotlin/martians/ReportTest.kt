@@ -2,8 +2,9 @@ package martians
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import martians.Orientation.E
-import martians.Orientation.N
+import martians.domain.Orientation.E
+import martians.domain.Orientation.N
+import martians.domain.RobotState
 
 class ReportTest : FunSpec({
 

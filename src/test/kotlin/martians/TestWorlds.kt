@@ -1,6 +1,13 @@
 package martians
 
 import kotlinx.collections.immutable.toPersistentHashSet
+import martians.domain.Command
+import martians.domain.GridBounds
+import martians.domain.Orientation
+import martians.domain.Position
+import martians.domain.RobotState
+import martians.domain.SafeSquares
+import martians.domain.WorldState
 
 infix fun Int.at(y: Int) = Position(this, y)
 

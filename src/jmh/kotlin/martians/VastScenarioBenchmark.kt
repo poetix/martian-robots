@@ -1,5 +1,6 @@
 package martians
 
+import martians.domain.RobotState
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
