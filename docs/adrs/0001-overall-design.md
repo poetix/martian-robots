@@ -111,7 +111,11 @@ to `Forward`.
 
 ### 5. Scents are a persistent set
 
-`scents` is a `PersistentSet<Position>` from `kotlinx-collections-immutable`.
+`scents` is a `PersistentSet<Position>` from `kotlinx-collections-immutable`,
+created with `persistentHashSetOf()`. The library's default `persistentSetOf()`
+keeps insertion order, which we never use, and
+[benchmark 0001](../benchmarks/0001-vast-scenario.md) measured it as about 7%
+slower and 16% more allocation-heavy.
 `Forward` records a scent with `scents.adding(position)`, which costs O(log n)
 and shares structure with the previous world. We call `adding` explicitly.
 Without an extra import, `scents + position` resolves to the standard library's

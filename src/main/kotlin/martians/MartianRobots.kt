@@ -1,6 +1,6 @@
 package martians
 
-import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.persistentHashSetOf
 
 object MartianRobots {
     /** Parses [input], runs every robot, and returns one report line per robot. */
@@ -11,7 +11,7 @@ object MartianRobots {
 
     /** Runs each robot in turn against [safeSquares], carrying scents forward, and returns each robot's final state. */
     fun execute(programs: List<RobotProgram>, safeSquares: SafeSquares): List<RobotState> {
-        var scents = persistentSetOf<Position>()
+        var scents = persistentHashSetOf<Position>()
         return programs.map { program ->
             val finished = WorldState(program.start, safeSquares, scents).execute(program.commands)
             scents = finished.scents

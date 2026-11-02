@@ -1,6 +1,6 @@
 package martians
 
-import kotlinx.collections.immutable.toPersistentSet
+import kotlinx.collections.immutable.toPersistentHashSet
 
 infix fun Int.at(y: Int) = Position(this, y)
 
@@ -12,7 +12,7 @@ fun world(
     scents: Set<Position> = emptySet(),
     lost: Boolean = false,
     safeSquares: SafeSquares = grid5x3,
-) = WorldState(RobotState(position, orientation, lost), safeSquares, scents.toPersistentSet())
+) = WorldState(RobotState(position, orientation, lost), safeSquares, scents.toPersistentHashSet())
 
 fun commands(letters: String): List<Command> = letters.map(standardCommands::getValue)
 

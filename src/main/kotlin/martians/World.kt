@@ -1,7 +1,7 @@
 package martians
 
 import kotlinx.collections.immutable.PersistentSet
-import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.persistentHashSetOf
 
 data class RobotState(
     val position: Position,
@@ -23,7 +23,7 @@ data class RobotState(
 data class WorldState(
     val robot: RobotState,
     val safeSquares: SafeSquares,
-    val scents: PersistentSet<Position> = persistentSetOf(),
+    val scents: PersistentSet<Position> = persistentHashSetOf(),
 ) {
     fun updateRobot(update: RobotState.() -> RobotState): WorldState = copy(robot = robot.update())
 
