@@ -12,7 +12,7 @@ class VastScenarioTest : FunSpec({
 
     test("about one point in sixteen is a hole") {
         val sample = (0 until 400).flatMap { x -> (0 until 400).map { y -> x at y } }
-        sample.count(VastScenario::isHole).toDouble() / sample.size shouldBe (1.0 / 16 plusOrMinus 0.005)
+        sample.count { !scenario.safeSquares.isSafe(it) }.toDouble() / sample.size shouldBe (1.0 / 16 plusOrMinus 0.005)
     }
 
     test("every robot ends on a safe square, lost or not") {

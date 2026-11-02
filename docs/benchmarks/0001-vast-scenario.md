@@ -26,6 +26,16 @@ deterministic world from a seed:
   modulo 16, is 0. That makes about one point in 16 a hole, scattered rather
   than in lines. Holes are expressed purely as a `SafeSquares` predicate, so no
   production code knows about them.
+
+  > **Later change:** the hole rule has since been simplified. A point is now a
+  > hole when the low four bits of `Position.hashCode()` (`31 * x + y`) are
+  > zero, which puts holes on regular diagonals at the same one-in-16 density.
+  > Re-measured with streaming execution, the old rule gives 88.6 / 82.7 ms and
+  > the new rule 95.9 / 85.9 ms (1k / 1G field), with about 7% more allocation.
+  > The likely cause is that robots survive longer between diagonal holes, so
+  > more commands run; this was not counted. Streaming made no measurable
+  > difference. All figures below use the original rule, and the relative
+  > results and recommendations are unaffected.
 - **Robots:** `robotCount` robots. Each starts on a random safe point facing a
   random direction, with 1–99 instructions drawn uniformly from `L`, `R`, `F`.
 
