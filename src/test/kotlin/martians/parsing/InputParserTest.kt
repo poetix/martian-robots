@@ -9,6 +9,7 @@ import martians.TurnRight
 import martians.at
 import martians.domain.Command
 import martians.domain.GridBounds
+import martians.domain.Outcome
 import martians.domain.Orientation.E
 import martians.domain.Orientation.W
 import martians.domain.RobotProgram
@@ -74,7 +75,7 @@ class InputParserTest : FunSpec({
         }
 
         test("the command resolver is used for instruction letters") {
-            val backward = Command { it }
+            val backward = Command { robot, _ -> Outcome(robot) }
             val resolver = { letter: Char -> if (letter == 'B') backward else standardCommands[letter] }
             InputParser(resolver).parse("5 3\n1 1 E\nFB").robots.single().commands shouldBe listOf(Forward, backward)
         }

@@ -10,6 +10,7 @@ import martians.TurnRight
 import martians.at
 import martians.domain.Command
 import martians.domain.GridBounds
+import martians.domain.Outcome
 import martians.domain.Orientation.E
 import martians.domain.Orientation.N
 import martians.domain.RobotProgram
@@ -76,7 +77,7 @@ class LineParserTest : FunSpec({
         }
 
         test("letters are looked up with the command resolver supplied") {
-            val backward = Command { it }
+            val backward = Command { robot, _ -> Outcome(robot) }
             val resolver = { letter: Char -> if (letter == 'B') backward else standardCommands[letter] }
             LineParser(listOf("FB").iterator(), resolver).parseInstructions() shouldBe listOf(Forward, backward)
         }

@@ -1,6 +1,6 @@
 # ADR 0001 — Martian Robots overall design
 
-- **Status:** Accepted
+- **Status:** Accepted; §1 and §5 superseded and §3 amended by [ADR 0002](0002-robot-addressed-commands.md)
 - **Date:** 2026-11-02
 - **Scope:** Shape of the domain model, command execution, input parsing and
   output reporting for the Martian Robots exercise. Each decision below closes
@@ -36,6 +36,11 @@ Constraints:
 ## Decision
 
 ### 1. The world is an immutable value; commands are functions over it
+
+> **Superseded (2026-11-02) by [ADR 0002](0002-robot-addressed-commands.md) §1.**
+> Commands now take a robot and a read-only `Environment` and return an
+> `Outcome` of new robot state plus effects. `WorldState` no longer exists.
+> Commands remain pure functions.
 
 `WorldState(robot, safeSquares, scents)` holds everything a command can see or
 change:
@@ -89,6 +94,9 @@ letter but cannot list the valid ones.
 
 ### 3. Losing a robot stops execution in one place
 
+> **Amended (2026-11-02) by [ADR 0002](0002-robot-addressed-commands.md) §3.**
+> The rule still holds, but the check now lives in `RobotProgram.run`.
+
 `WorldState.execute(commands)` folds the commands over the world and stops
 applying them once `robot.isLost` is true. Individual commands do not check
 whether the robot is lost.
@@ -118,6 +126,11 @@ to `Forward`.
 > context (e.g. per-direction edges) would widen the interface**.
 
 ### 5. Scents are a persistent set
+
+> **Superseded (2026-11-02) by [ADR 0002](0002-robot-addressed-commands.md) §4.**
+> Scents are no longer passed through commands as a value. The runner owns a
+> mutable scent set, which a parallel runner could replace with a concurrent
+> one. `kotlinx-collections-immutable` has been removed.
 
 `scents` is a `PersistentSet<Position>` from `kotlinx-collections-immutable`,
 created with `persistentHashSetOf()`. The library's default `persistentSetOf()`

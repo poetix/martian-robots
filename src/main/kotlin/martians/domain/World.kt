@@ -1,8 +1,5 @@
 package martians.domain
 
-import kotlinx.collections.immutable.PersistentSet
-import kotlinx.collections.immutable.persistentHashSetOf
-
 data class RobotState(
     val position: Position,
     val orientation: Orientation,
@@ -17,20 +14,19 @@ data class RobotState(
 }
 
 /** A robot's starting state and the commands it is to execute. */
-data class RobotProgram(val start: RobotState, val commands: List<Command>)
-
-/**
- * Everything a command can see or change: the current robot, where it is safe to go, and scents left so far.
- * Scents are a persistent set, so leaving one shares structure with the previous world rather than copying it.
- */
-data class WorldState(
-    val robot: RobotState,
-    val safeSquares: SafeSquares,
-    val scents: PersistentSet<Position> = persistentHashSetOf(),
-) {
-    fun updateRobot(update: RobotState.() -> RobotState): WorldState = copy(robot = robot.update())
-
-    /** Applies [commands] in order; once the robot is lost, remaining commands are not executed. */
-    fun execute(commands: List<Command>): WorldState =
-        commands.fold(this) { world, command -> if (world.robot.isLost) world else command.execute(world) }
+data class RobotProgram(val start: RobotState, val commands: List<Command>) {
+    /**
+     * Executes the commands in order against [environment], passing each effect to [apply], in order, as soon as it occurs, and
+     * returns the robot's final state. Once the robot is lost, remaining commands are not executed.
+     */
+    fun run(environment: Environment, apply: (Effect) -> Unit): RobotState {
+        var robot = start
+        for (command in commands) {
+            if (robot.isLost) break
+            val outcome = command.execute(robot, environment)
+            outcome.effects.forEach(apply)
+            robot = outcome.robot
+        }
+        return robot
+    }
 }

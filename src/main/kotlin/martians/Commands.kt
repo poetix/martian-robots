@@ -1,15 +1,17 @@
 package martians
 
 import martians.domain.Command
+import martians.domain.Environment
+import martians.domain.LeaveScent
+import martians.domain.Outcome
 import martians.domain.RobotState
-import martians.domain.WorldState
 
 data object TurnLeft : Command {
-    override fun execute(world: WorldState) = world.updateRobot(RobotState::turnedLeft)
+    override fun execute(robot: RobotState, environment: Environment) = Outcome(robot.turnedLeft())
 }
 
 data object TurnRight : Command {
-    override fun execute(world: WorldState) = world.updateRobot(RobotState::turnedRight)
+    override fun execute(robot: RobotState, environment: Environment) = Outcome(robot.turnedRight())
 }
 
 /**
@@ -17,12 +19,12 @@ data object TurnRight : Command {
  * where it stood, unless a scent is already there, in which case the move is ignored.
  */
 data object Forward : Command {
-    override fun execute(world: WorldState) = world.run {
+    override fun execute(robot: RobotState, environment: Environment): Outcome {
         val moved = robot.moved()
-        when {
-            safeSquares.isSafe(moved.position) -> copy(robot = moved)
-            robot.position in scents -> this
-            else -> copy(robot = robot.copy(isLost = true), scents = scents.adding(robot.position))
+        return when {
+            environment.isSafe(moved.position) -> Outcome(moved)
+            environment.hasScent(robot.position) -> Outcome(robot)
+            else -> Outcome(robot.copy(isLost = true), listOf(LeaveScent(robot.position)))
         }
     }
 }
