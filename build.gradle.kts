@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.pitest)
+    alias(libs.plugins.jmh)
     application
 }
 
@@ -40,4 +41,9 @@ pitest {
     outputFormats = setOf("HTML", "XML")
     timestampedReports = false
     excludedMethods = setOf("main")
+}
+
+jmh {
+    jmhVersion = libs.versions.jmh.get()
+    includeTests = true
 }
