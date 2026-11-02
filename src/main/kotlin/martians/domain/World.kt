@@ -11,6 +11,9 @@ data class RobotState(
     fun turnedLeft(): RobotState = copy(orientation = orientation.left())
 
     fun turnedRight(): RobotState = copy(orientation = orientation.right())
+
+    /** The robot's position and orientation as `x y O`, followed by `LOST` if it has been lost. */
+    fun report(): String = "${position.x} ${position.y} $orientation" + if (isLost) " LOST" else ""
 }
 
 /** A robot's starting state and the commands it is to execute. */

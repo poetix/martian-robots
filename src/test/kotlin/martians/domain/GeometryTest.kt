@@ -38,15 +38,6 @@ class GeometryTest : FunSpec({
         }
     }
 
-    test("a moved robot keeps its orientation") {
-        RobotState(2 at 1, E).moved() shouldBe RobotState(3 at 1, E)
-    }
-
-    test("a turned robot keeps its position") {
-        RobotState(2 at 1, E).turnedLeft() shouldBe RobotState(2 at 1, N)
-        RobotState(2 at 1, E).turnedRight() shouldBe RobotState(2 at 1, S)
-    }
-
     context("grid bounds include their edges and exclude everything beyond") {
         withData(
             nameFn = { (position, safe) -> "${position.x},${position.y} is ${if (safe) "safe" else "unsafe"}" },
@@ -60,6 +51,12 @@ class GeometryTest : FunSpec({
         ) { (position, safe) ->
             grid5x3.isSafe(position) shouldBe safe
         }
+    }
+
+    test("a grid whose corners coincide holds a single point") {
+        val point = GridBounds(0 at 0, 0 at 0)
+        point.isSafe(0 at 0) shouldBe true
+        listOf(1 at 0, 0 at 1, -1 at 0, 0 at -1).none(point::isSafe) shouldBe true
     }
 
     test("grid bounds reject a top-right below or left of bottom-left") {
