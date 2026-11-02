@@ -4,6 +4,7 @@ import martians.domain.RobotProgram
 import martians.domain.RobotState
 import martians.domain.SafeSquares
 import martians.parsing.InputParser
+import martians.running.SequentialProgramRunner
 
 object MartianRobots {
     /** Streams [lines] through parsing and execution, passing each robot's report to [emit] as soon as it is known. */
@@ -22,7 +23,7 @@ object MartianRobots {
     fun execute(programs: Sequence<RobotProgram>, safeSquares: SafeSquares): Sequence<RobotState> = sequence {
         val surface = Surface(safeSquares)
         for (program in programs) {
-            yield(program.run(surface, surface::apply))
+            yield(SequentialProgramRunner.run(program, surface, surface::apply))
         }
     }
 }

@@ -17,19 +17,4 @@ data class RobotState(
 }
 
 /** A robot's starting state and the commands it is to execute. */
-data class RobotProgram(val start: RobotState, val commands: List<Command>) {
-    /**
-     * Executes the commands in order against [environment], passing each effect to [apply], in order, as soon as it occurs, and
-     * returns the robot's final state. Once the robot is lost, remaining commands are not executed.
-     */
-    fun run(environment: Environment, apply: (Effect) -> Unit): RobotState {
-        var robot = start
-        for (command in commands) {
-            if (robot.isLost) break
-            val outcome = command.execute(robot, environment)
-            outcome.effects.forEach(apply)
-            robot = outcome.robot
-        }
-        return robot
-    }
-}
+data class RobotProgram(val start: RobotState, val commands: List<Command>)

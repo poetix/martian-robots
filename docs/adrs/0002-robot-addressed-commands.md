@@ -65,13 +65,30 @@ or none.
 > **a new `Effect` case each time a command needs a new kind of change, and an
 > exhaustive `when` in each environment that applies them**.
 
-### 3. One robot's run is shared by every runner
+### 3. Stepping a robot belongs to a runner, outside the domain
 
-`RobotProgram.run(environment, apply): RobotState` executes the commands in
-order. It passes each effect to `apply` as soon as it occurs, and stops once
-the robot is lost. It is the only code that steps a robot. This keeps ADR 0001
-§3's rule (loss is checked in one place) and moves it from `WorldState` to
-`RobotProgram`.
+`RobotProgram(start, commands)` is plain data. Stepping a robot through it is
+done by `SequentialProgramRunner.run(program, environment, apply): RobotState`,
+in package `martians.running`. It executes the commands in order, passes each
+effect to `apply` as soon as it occurs, and stops once the robot is lost. This
+keeps ADR 0001 §3's rule (loss is checked in one place), now outside the domain.
+
+The domain package (`martians.domain`) holds only the model:
+- positions, orientation and terrain;
+- robot state and programs;
+- commands, outcomes, effects and the environment interface.
+
+It depends on nothing else in the project. `ArchitectureTest` enforces this
+with an ArchUnit rule: domain classes may depend only on the domain and the
+Kotlin and Java runtimes.
+
+> In the context of **executing robot programs**, facing **more than one
+> possible execution policy (sequential now, perhaps parallel or reconciling
+> later)**, we decided for **keeping `RobotProgram` as data and stepping robots
+> in a runner outside the domain** and neglected **a `run` method on
+> `RobotProgram`**, to achieve **a domain that describes robots and rules but
+> not how they are scheduled, with that boundary checked by a test**, accepting
+> **one more package and object for what is, today, a short loop**.
 
 ### 4. The runner owns the scent store
 
@@ -83,7 +100,8 @@ those before it.
 
 A parallel runner would construct the same `Surface` over
 `ConcurrentHashMap.newKeySet()`, the set view of a `ConcurrentHashMap`. It
-would run `RobotProgram.run` from several threads. Commands, `RobotProgram` and
+would step robots with `SequentialProgramRunner.run` from several threads, one
+robot per thread. Commands, `RobotProgram` and
 `Surface` would not change.
 
 > In the context of **storing scent**, facing **sequential and parallel runners
@@ -115,7 +133,8 @@ would run `RobotProgram.run` from several threads. Commands, `RobotProgram` and
   depend on timing. A parallel runner that must keep the brief's rules needs
   reconciliation, such as benchmark 0001 recommendation 2: run every robot in
   parallel, then re-run in order only the robots that met a scent.
-  `RobotProgram.run` supports that, but the runner itself is not built.
+  `SequentialProgramRunner` can step each robot for such a runner, but the
+  runner itself is not built.
 - An exhaustive `when` over `Effect` in each environment that applies effects.
 
 **Deferred (intentional)**

@@ -95,7 +95,8 @@ letter but cannot list the valid ones.
 ### 3. Losing a robot stops execution in one place
 
 > **Amended (2026-11-02) by [ADR 0002](0002-robot-addressed-commands.md) §3.**
-> The rule still holds, but the check now lives in `RobotProgram.run`.
+> The rule still holds, but the check now lives in
+> `SequentialProgramRunner.run`, outside the domain.
 
 `WorldState.execute(commands)` folds the commands over the world and stops
 applying them once `robot.isLost` is true. Individual commands do not check

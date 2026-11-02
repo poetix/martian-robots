@@ -18,7 +18,7 @@ changes would pay off if the rules or the size of the problem changed.
 
 ## Scenario
 
-[`VastScenario`](../../src/test/kotlin/martians/VastScenario.kt) builds a
+[`VastScenario`](../../src/jmh/kotlin/martians/VastScenario.kt) builds a
 deterministic world from a seed:
 
 - **Field:** a square `size` points across.
@@ -39,7 +39,7 @@ deterministic world from a seed:
 - **Robots:** `robotCount` robots. Each starts on a random safe point facing a
   random direction, with 1–99 instructions drawn uniformly from `L`, `R`, `F`.
 
-[`VastScenarioTest`](../../src/test/kotlin/martians/VastScenarioTest.kt) checks
+[`VastScenarioTest`](../../src/jmh/kotlin/martians/VastScenarioTest.kt) checks
 the generator and the runner together on a smaller instance (1,000 × 1,000,
 10,000 robots):
 
@@ -68,7 +68,13 @@ a hole, so roughly half the robots are lost.
 java -jar build/libs/martian-robots-jmh.jar VastScenarioBenchmark -prof gc
 ```
 
-Run the jar with a JDK 25 `java` (Gradle's toolchain JDK will do). For a
+Run the jar with a JDK 25 `java` (Gradle's toolchain JDK will do).
+
+The scenario and its test live in the `jmh` source set, so `./gradlew test`
+does not run them. Run `./gradlew benchmarkScenarioTest` to check the scenario
+on its own; `./gradlew jmh` runs it before benchmarking.
+
+For a
 profile, add `-prof "jfr:dir=build/jfr"` and inspect the recording with
 `jfr view hot-methods <file>` and `jfr view allocation-by-class <file>`.
 

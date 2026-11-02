@@ -17,6 +17,7 @@ dependencies {
     testImplementation(libs.kotest.runner.junit5)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.extensions.pitest)
+    testImplementation(libs.archunit)
 }
 
 application {
@@ -44,4 +45,16 @@ pitest {
 jmh {
     jmhVersion = libs.versions.jmh.get()
     includeTests = true
+}
+
+val benchmarkScenarioTest by tasks.registering(Test::class) {
+    description = "Checks that the benchmark scenarios behave correctly."
+    group = "verification"
+    testClassesDirs = sourceSets["jmh"].output.classesDirs
+    classpath = sourceSets["jmh"].runtimeClasspath
+    useJUnitPlatform()
+}
+
+tasks.named("jmh") {
+    dependsOn(benchmarkScenarioTest)
 }
