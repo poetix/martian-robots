@@ -43,6 +43,12 @@ class CommandsTest : FunSpec({
             Forward.execute(robot(2 at 3, N), grid5x3.withScent(2 at 3)) shouldBe robot(2 at 3, N).withoutEffects()
         }
 
+        test("a scent at a corner stops the robot falling off either edge") {
+            val scentedCorner = grid5x3.withScent(5 at 3)
+            Forward.execute(robot(5 at 3, N), scentedCorner) shouldBe robot(5 at 3, N).withoutEffects()
+            Forward.execute(robot(5 at 3, E), scentedCorner) shouldBe robot(5 at 3, E).withoutEffects()
+        }
+
         test("onto an unsafe square is not stopped by a scent on a neighbouring point") {
             Forward.execute(robot(3 at 3, N), grid5x3.withScent(2 at 3)) shouldBe lost(3 at 3, N).leavingScent(3 at 3)
         }
