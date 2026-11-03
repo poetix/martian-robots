@@ -19,6 +19,7 @@ class Surface(
 
     override fun hasScent(position: Position) = position in scents
 
+    /** Applies [effect] to this surface, so that robots perceive it from now on. */
     fun apply(effect: Effect) {
         when (effect) {
             is LeaveScent -> scents.add(effect.position)

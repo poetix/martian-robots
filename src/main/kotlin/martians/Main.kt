@@ -5,6 +5,7 @@ import java.io.InputStream
 import java.io.PrintStream
 import kotlin.system.exitProcess
 
+/** Reads robots from standard input, reports them on standard output, and exits with [runCli]'s status. */
 fun main() {
     exitProcess(runCli(System.`in`, System.out, System.err))
 }

@@ -6,10 +6,12 @@ import martians.domain.LeaveScent
 import martians.domain.Outcome
 import martians.domain.RobotState
 
+/** Turns the robot 90 degrees left on the spot. Has no effect on the world. */
 data object TurnLeft : Command {
     override fun execute(robot: RobotState, environment: Environment) = Outcome(robot.turnedLeft())
 }
 
+/** Turns the robot 90 degrees right on the spot. Has no effect on the world. */
 data object TurnRight : Command {
     override fun execute(robot: RobotState, environment: Environment) = Outcome(robot.turnedRight())
 }

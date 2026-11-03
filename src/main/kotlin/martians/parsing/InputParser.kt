@@ -4,6 +4,7 @@ import martians.domain.Command
 import martians.domain.GridBounds
 import martians.domain.RobotProgram
 
+/** Thrown when input does not follow the expected format; the message begins with the offending line number. */
 class InputException(message: String) : IllegalArgumentException(message)
 
 /**
