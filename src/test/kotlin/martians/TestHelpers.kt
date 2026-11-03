@@ -14,7 +14,7 @@ infix fun Int.at(y: Int) = Position(this, y)
 /** The lines of this text, split exactly as a line reader over a stream would split them. */
 fun String.inputLines(): Sequence<String> = reader().buffered().lineSequence()
 
-val grid5x3 = GridBounds(0 at 0, 5 at 3)
+val grid5x3 = GridBounds.fromOriginTo(5 at 3)
 
 fun robot(position: Position, orientation: Orientation) = RobotState(position, orientation)
 
@@ -22,7 +22,8 @@ fun lost(position: Position, orientation: Orientation) = RobotState(position, or
 
 fun SafeSquares.withoutScent() = Surface(this)
 
-fun SafeSquares.withScent(vararg positions: Position) = Surface(this, positions.toMutableSet())
+fun SafeSquares.withScent(vararg positions: Position) =
+    Surface(this).apply { positions.forEach { apply(LeaveScent(it)) } }
 
 fun RobotState.withoutEffects() = Outcome(this)
 

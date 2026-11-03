@@ -14,8 +14,8 @@ import martians.domain.Orientation.E
 import martians.domain.Orientation.W
 import martians.domain.Outcome
 import martians.domain.RobotProgram
-import martians.domain.RobotState
 import martians.inputLines
+import martians.robot
 
 class InputParserTest : FunSpec({
 
@@ -33,12 +33,12 @@ class InputParserTest : FunSpec({
         test("robots are read only as far as the consumer asks, so input may be unbounded") {
             val endless = sequenceOf("5 3") + generateSequence { "1 1 E" }.flatMap { sequenceOf(it, "F") }
             parser.parse(endless) { _, programs -> programs.take(2).toList() } shouldBe
-                List(2) { RobotProgram(RobotState(1 at 1, E), listOf(Forward)) }
+                List(2) { RobotProgram(robot(1 at 1, E), listOf(Forward)) }
         }
 
         test("an error in a later robot surfaces only when that robot is reached") {
             val lines = sequenceOf("5 3", "1 1 E", "F", "1 1 Q", "F")
-            parser.parse(lines) { _, programs -> programs.first().start } shouldBe RobotState(1 at 1, E)
+            parser.parse(lines) { _, programs -> programs.first().start } shouldBe robot(1 at 1, E)
             shouldThrow<InputException> { parser.parse(lines) { _, programs -> programs.toList() } }
         }
 
@@ -54,8 +54,8 @@ class InputParserTest : FunSpec({
             parseAll("5 3\n1 1 E\nRF\n0 3 W\n\n") shouldBe Pair(
                 GridBounds(0 at 0, 5 at 3),
                 listOf(
-                    RobotProgram(RobotState(1 at 1, E), listOf(TurnRight, Forward)),
-                    RobotProgram(RobotState(0 at 3, W), emptyList()),
+                    RobotProgram(robot(1 at 1, E), listOf(TurnRight, Forward)),
+                    RobotProgram(robot(0 at 3, W), emptyList()),
                 ),
             )
         }

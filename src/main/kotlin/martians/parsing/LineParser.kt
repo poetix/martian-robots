@@ -10,8 +10,8 @@ import martians.domain.RobotState
 /**
  * Takes input lines one at a time, numbering them so that every failure can say which line it is on.
  * Every line is trimmed. Blank lines are skipped, except the line after a robot's position, where a blank line
- * means a robot with no instructions. Each `parse` method consumes one non-blank line, except [parseInstructions],
- * which consumes the next line whether blank or not, and [parseProgram], which consumes a robot's two.
+ * means a robot with no instructions. [parseGridBounds] consumes one non-blank line; [parseProgram] consumes a
+ * robot's position line and the line after it.
  */
 internal class LineParser(
     private val iterator: Iterator<String>,
@@ -30,7 +30,7 @@ internal class LineParser(
     fun parseGridBounds(): GridBounds =
         takeAndParse("grid size") { line ->
             val (xCoordinate, yCoordinate) = line.takeFields(2, "grid size as 'x y'")
-            GridBounds(Position(0, 0), parsePosition(xCoordinate, yCoordinate))
+            GridBounds.fromOriginTo(parsePosition(xCoordinate, yCoordinate))
         }
 
     fun parseProgram(gridBounds: GridBounds): RobotProgram =
@@ -43,7 +43,7 @@ internal class LineParser(
             parseInstructions(),
         )
 
-    fun parseRobotState(): RobotState =
+    private fun parseRobotState(): RobotState =
         takeAndParse("robot position") { line ->
             val (xCoordinate, yCoordinate, orientationName) =
                 line.takeFields(3, "robot position as 'x y orientation'")
@@ -54,7 +54,7 @@ internal class LineParser(
             RobotState(parsePosition(xCoordinate, yCoordinate), orientation)
         }
 
-    fun parseInstructions(): List<Command> =
+    private fun parseInstructions(): List<Command> =
         takeAndParse("robot instructions", skipBlank = false) { line ->
             if (line.length > MAX_INSTRUCTION_LENGTH) {
                 fail("Instructions are ${line.length} characters; at most $MAX_INSTRUCTION_LENGTH allowed")

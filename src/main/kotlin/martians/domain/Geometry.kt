@@ -31,7 +31,7 @@ enum class Orientation(val movesX: Int, val movesY: Int) {
 }
 
 /** Answers whether a robot can stand on a position without being lost. */
-fun interface SafeSquares {
+interface SafeSquares {
     /** Whether a robot can stand on [position] without being lost. */
     fun isSafe(position: Position): Boolean
 }
@@ -51,4 +51,9 @@ data class GridBounds(val bottomLeft: Position, val topRight: Position) : SafeSq
 
     override fun isSafe(position: Position) =
         position.x in bottomLeft.x..topRight.x && position.y in bottomLeft.y..topRight.y
+
+    companion object {
+        /** The grid from `0 0` to [topRight], as the brief's input describes it. */
+        fun fromOriginTo(topRight: Position) = GridBounds(Position(0, 0), topRight)
+    }
 }

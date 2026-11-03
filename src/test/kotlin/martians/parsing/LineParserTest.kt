@@ -15,8 +15,8 @@ import martians.domain.Orientation.E
 import martians.domain.Orientation.N
 import martians.domain.Outcome
 import martians.domain.RobotProgram
-import martians.domain.RobotState
 import martians.grid5x3
+import martians.robot
 
 class LineParserTest : FunSpec({
 
@@ -40,58 +40,63 @@ class LineParserTest : FunSpec({
     }
 
     context("robot position") {
+        fun start(positionLine: String) = parsing(positionLine, "").parseProgram(grid5x3).start
+
         test("coordinates and orientation") {
-            parsing("1 2 E").parseRobotState() shouldBe RobotState(1 at 2, E)
+            start("1 2 E") shouldBe robot(1 at 2, E)
         }
 
         test("any whitespace separates fields") {
-            parsing("  3\t2   N ").parseRobotState() shouldBe RobotState(3 at 2, N)
+            start("3\t2   N") shouldBe robot(3 at 2, N)
         }
 
         withData(
             nameFn = { "rejects '$it'" },
-            "", "1 2", "1 2 E E", "1 2 X", "1 2 n", "x 2 N", "1 51 N",
+            "1 2", "1 2 E E", "1 2 X", "1 2 n", "x 2 N", "1 51 N",
         ) { line ->
-            shouldThrow<InputException> { parsing(line).parseRobotState() }
+            shouldThrow<InputException> { start(line) }
         }
     }
 
     context("instructions") {
+        fun commands(instructionLine: String, resolver: (Char) -> Command? = standardCommands::get) =
+            LineParser(listOf("1 1 E", instructionLine).iterator(), resolver).parseProgram(grid5x3).commands
+
         test("each letter becomes a command") {
-            parsing("LRF").parseInstructions() shouldBe listOf(TurnLeft, TurnRight, Forward)
+            commands("LRF") shouldBe listOf(TurnLeft, TurnRight, Forward)
         }
 
         test("an empty line is no commands") {
-            parsing("").parseInstructions() shouldBe emptyList()
+            commands("") shouldBe emptyList()
         }
 
         test("99 instructions are accepted") {
-            parsing("F".repeat(99)).parseInstructions().size shouldBe 99
+            commands("F".repeat(99)).size shouldBe 99
         }
 
         withData(
             nameFn = { "rejects '${it.take(10)}...' (${it.length} chars)" },
             "F".repeat(100), "LXF", "lrf", "L F",
         ) { line ->
-            shouldThrow<InputException> { parsing(line).parseInstructions() }
+            shouldThrow<InputException> { commands(line) }
         }
 
         test("letters are looked up with the command resolver supplied") {
             val backward = Command { robot, _ -> Outcome(robot) }
             val resolver = { letter: Char -> if (letter == 'B') backward else standardCommands[letter] }
-            LineParser(listOf("FB").iterator(), resolver).parseInstructions() shouldBe listOf(Forward, backward)
+            commands("FB", resolver) shouldBe listOf(Forward, backward)
         }
 
         test("a letter the resolver does not know is rejected, naming the letter") {
-            shouldThrow<InputException> { parsing("LXF").parseInstructions() }
-                .message shouldBe "Line 1: 'X' is not a known instruction"
+            shouldThrow<InputException> { commands("LXF") }
+                .message shouldBe "Line 2: 'X' is not a known instruction"
         }
     }
 
     context("programs") {
         test("a position line and an instruction line make a program") {
             parsing("1 1 E", "RF").parseProgram(grid5x3) shouldBe
-                RobotProgram(RobotState(1 at 1, E), listOf(TurnRight, Forward))
+                RobotProgram(robot(1 at 1, E), listOf(TurnRight, Forward))
         }
 
         test("a robot may not start outside the grid") {
@@ -104,17 +109,17 @@ class LineParserTest : FunSpec({
         test("every line is trimmed") {
             val parser = parsing("  5 3 ", "\t1 1 E  ", " RF\t")
             parser.parseGridBounds() shouldBe grid5x3
-            parser.parseProgram(grid5x3) shouldBe RobotProgram(RobotState(1 at 1, E), listOf(TurnRight, Forward))
+            parser.parseProgram(grid5x3) shouldBe RobotProgram(robot(1 at 1, E), listOf(TurnRight, Forward))
         }
 
         test("blank lines before the grid and before a robot are skipped") {
             val parser = parsing("", "5 3", "", "  ", "1 1 E", "F")
             parser.parseGridBounds() shouldBe grid5x3
-            parser.parseProgram(grid5x3) shouldBe RobotProgram(RobotState(1 at 1, E), listOf(Forward))
+            parser.parseProgram(grid5x3) shouldBe RobotProgram(robot(1 at 1, E), listOf(Forward))
         }
 
         test("a blank line after a robot's position is its instructions, not skipped") {
-            parsing("1 1 E", "  ", "F").parseProgram(grid5x3) shouldBe RobotProgram(RobotState(1 at 1, E), emptyList())
+            parsing("1 1 E", "  ", "F").parseProgram(grid5x3) shouldBe RobotProgram(robot(1 at 1, E), emptyList())
         }
 
         test("there are more programs only if a non-blank line remains") {

@@ -4,9 +4,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import martians.at
 import martians.domain.LeaveScent
-import martians.domain.Position
 import martians.grid5x3
-import java.util.concurrent.ConcurrentHashMap
 
 class SurfaceTest : FunSpec({
 
@@ -21,11 +19,5 @@ class SurfaceTest : FunSpec({
         surface.hasScent(2 at 3) shouldBe false
         surface.apply(LeaveScent(2 at 3))
         surface.hasScent(2 at 3) shouldBe true
-    }
-
-    test("the scent store is the caller's choice, e.g. a concurrent set for parallel runners") {
-        val scents = ConcurrentHashMap.newKeySet<Position>()
-        Surface(grid5x3, scents).apply(LeaveScent(2 at 3))
-        scents shouldBe setOf(2 at 3)
     }
 })

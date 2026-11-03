@@ -26,10 +26,8 @@ class RobotStepperTest : FunSpec({
         override fun hasScent(position: Position) = LeaveScent(position) in effects
     }
 
-    fun run(vararg commands: Command, environment: Environment = Recording()): RobotState =
-        RobotStepper.run(RobotProgram(start, commands.toList()), environment) {
-            (environment as Recording).effects += it
-        }
+    fun run(vararg commands: Command, environment: Recording = Recording()): RobotState =
+        RobotStepper.run(RobotProgram(start, commands.toList()), environment) { environment.effects += it }
 
     test("each effect is applied before the next command executes") {
         val leaveScent = Command { robot, _ -> Outcome(robot, listOf(LeaveScent(robot.position))) }
