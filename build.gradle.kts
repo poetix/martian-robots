@@ -1,8 +1,9 @@
+import info.solidsoft.gradle.pitest.PitestPluginExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.pitest)
+    alias(libs.plugins.pitest) apply false
     application
 }
 
@@ -42,12 +43,17 @@ tasks.named<JavaExec>("run") {
     standardInput = System.`in`
 }
 
-pitest {
-    pitestVersion = libs.versions.pitest.get()
-    targetClasses = setOf("martians.*")
-    mutators = setOf("STRONGER")
-    threads = Runtime.getRuntime().availableProcessors()
-    outputFormats = setOf("HTML", "XML")
-    timestampedReports = false
-    excludedMethods = setOf("main")
+// The PIT plugin (1.19.0) calls a Gradle API deprecated in Gradle 9 as soon as it is applied, so apply it only when
+// mutation testing is asked for; other builds then run without deprecation warnings.
+if (gradle.startParameter.taskNames.any { it.endsWith("pitest") }) {
+    apply(plugin = "info.solidsoft.pitest")
+    configure<PitestPluginExtension> {
+        pitestVersion = libs.versions.pitest.get()
+        targetClasses = setOf("martians.*")
+        mutators = setOf("STRONGER")
+        threads = Runtime.getRuntime().availableProcessors()
+        outputFormats = setOf("HTML", "XML")
+        timestampedReports = false
+        excludedMethods = setOf("main")
+    }
 }

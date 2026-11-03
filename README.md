@@ -45,7 +45,7 @@ build/install/martian-robots/bin/martian-robots < input.txt
 | Command | What it does |
 |---|---|
 | `./gradlew test` | Unit, integration, CLI and architecture tests |
-| `./gradlew pitest` | Mutation testing with PIT; report in `build/reports/pitest/index.html` |
+| `./gradlew pitest` | Mutation testing with PIT; report in `build/reports/pitest/index.html`. The PIT Gradle plugin (1.19.0) triggers a Gradle deprecation warning. |
 
 ### Tests
 
