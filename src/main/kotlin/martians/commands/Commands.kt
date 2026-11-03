@@ -1,4 +1,4 @@
-package martians
+package martians.commands
 
 import martians.domain.Command
 import martians.domain.Environment

@@ -1,4 +1,4 @@
-package martians
+package martians.running
 
 import martians.domain.Effect
 import martians.domain.Environment

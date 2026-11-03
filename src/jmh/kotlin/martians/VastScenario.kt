@@ -1,5 +1,6 @@
 package martians
 
+import martians.commands.standardCommands
 import martians.domain.GridBounds
 import martians.domain.Orientation
 import martians.domain.RobotProgram

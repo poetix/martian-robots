@@ -1,6 +1,7 @@
 package martians
 
 import martians.domain.RobotState
+import martians.running.SequentialMissionRunner
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -39,5 +40,5 @@ open class VastScenarioBenchmark {
     }
 
     @Benchmark
-    fun execute(): List<RobotState> = MartianRobots.execute(scenario.programs.asSequence(), scenario.safeSquares).toList()
+    fun execute(): List<RobotState> = SequentialMissionRunner.run(scenario.programs.asSequence(), scenario.safeSquares).toList()
 }

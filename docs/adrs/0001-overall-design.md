@@ -96,7 +96,7 @@ letter but cannot list the valid ones.
 
 > **Amended (2026-11-02) by [ADR 0002](0002-robot-addressed-commands.md) §3.**
 > The rule still holds, but the check now lives in
-> `SequentialProgramRunner.run`, outside the domain.
+> `RobotStepper.run`, outside the domain.
 
 `WorldState.execute(commands)` folds the commands over the world and stops
 applying them once `robot.isLost` is true. Individual commands do not check
@@ -179,19 +179,18 @@ first line. It then calls `consume(bounds, programs)` and returns its result.
 are read and parsed only when the consumer asks for that robot. Each robot is a
 `RobotProgram(start: RobotState, commands: List<Command>)`.
 
-A pair of input lines cannot produce a `WorldState` on its own, because the
-world also needs the bounds and the scents left by earlier robots.
-`MartianRobots.execute` lazily builds each world from the robot's program, the
-bounds and the scents so far. It runs the world and passes the resulting scents
-to the next robot. `RobotState.report()` formats the result as `x y O` or
-`x y O LOST`.
+A pair of input lines cannot produce a robot's world on its own, because the
+world also needs the bounds and the scents left by earlier robots. The runner
+(now `SequentialMissionRunner`; see [ADR 0002](0002-robot-addressed-commands.md))
+runs each program against the bounds and the scents so far, and carries the
+scents on to the next robot. `RobotState.report()` formats the result as
+`x y O` or `x y O LOST`.
 
 The command-line program streams standard input through all three stages. Each
 report is printed before the next robot's lines are read, so memory use does
 not grow with the number of robots. Five million robots run in a 32 MB heap.
-`InputParser.parse(input: String): Mission` and
-`MartianRobots.run(input: String): String` read everything into memory, for
-tests and small inputs.
+There is no whole-input API. Tests that start from a string split it into lines
+with a test helper and use the same streaming entry points.
 
 > In the context of **turning text into worlds**, facing **the fact that a
 > robot's world depends on the robots before it**, we decided for **the parser
@@ -199,12 +198,12 @@ tests and small inputs.
 > between them**, and neglected **the parser building `WorldState`s directly**,
 > to achieve **a parser that can be tested without running robots, and one
 > place where scents flow from robot to robot**, accepting **a small
-> `Mission`/`RobotProgram` layer between parsing and execution**.
+> `RobotProgram` layer between parsing and execution**.
 
 > In the context of **inputs that may hold very many robots**, facing **memory
 > that grows with the input if it is read whole**, we decided for **the parser
 > handing a lazy, single-use sequence of programs to a caller-supplied
-> consumer** and neglected **returning a fully built `Mission`, and returning
+> consumer** and neglected **returning every program at once, and returning
 > a lazy sequence that outlives the parse call**, to achieve **constant-memory
 > streaming from input lines to output reports, with the consumer deciding
 > whether to stream or collect**, accepting **that input errors surface partway

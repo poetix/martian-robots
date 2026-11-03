@@ -15,7 +15,7 @@ import martians.domain.RobotState
 import martians.lost
 import martians.robot
 
-class SequentialProgramRunnerTest : FunSpec({
+class RobotStepperTest : FunSpec({
 
     val start = robot(1 at 1, N)
 
@@ -27,7 +27,7 @@ class SequentialProgramRunnerTest : FunSpec({
     }
 
     fun run(vararg commands: Command, environment: Environment = Recording()): RobotState =
-        SequentialProgramRunner.run(RobotProgram(start, commands.toList()), environment) {
+        RobotStepper.run(RobotProgram(start, commands.toList()), environment) {
             (environment as Recording).effects += it
         }
 

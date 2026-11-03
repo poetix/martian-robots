@@ -1,10 +1,18 @@
-package martians
+package martians.commands
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import martians.at
 import martians.domain.Orientation.E
 import martians.domain.Orientation.N
 import martians.domain.Orientation.W
+import martians.grid5x3
+import martians.leavingScent
+import martians.lost
+import martians.robot
+import martians.withScent
+import martians.withoutEffects
+import martians.withoutScent
 
 class CommandsTest : FunSpec({
 

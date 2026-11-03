@@ -4,19 +4,19 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
-import martians.Forward
-import martians.TurnLeft
-import martians.TurnRight
 import martians.at
+import martians.commands.Forward
+import martians.commands.TurnLeft
+import martians.commands.TurnRight
+import martians.commands.standardCommands
 import martians.domain.Command
 import martians.domain.GridBounds
-import martians.domain.Outcome
 import martians.domain.Orientation.E
 import martians.domain.Orientation.N
+import martians.domain.Outcome
 import martians.domain.RobotProgram
 import martians.domain.RobotState
 import martians.grid5x3
-import martians.standardCommands
 
 class LineParserTest : FunSpec({
 

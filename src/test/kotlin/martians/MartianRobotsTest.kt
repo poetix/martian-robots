@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 
 class MartianRobotsTest : FunSpec({
 
+    fun run(input: String): String = buildList { MartianRobots.run(input.inputLines(), ::add) }.joinToString("\n")
+
     test("sample input produces sample output") {
         val input = """
             5 3
@@ -22,7 +24,7 @@ class MartianRobotsTest : FunSpec({
             2 3 S
         """.trimIndent()
 
-        MartianRobots.run(input) shouldBe expected
+        run(input) shouldBe expected
     }
 
     test("scents accumulate across robots") {
@@ -42,6 +44,6 @@ class MartianRobotsTest : FunSpec({
             4 3 N
         """.trimIndent()
 
-        MartianRobots.run(input) shouldBe expected
+        run(input) shouldBe expected
     }
 })

@@ -1,9 +1,11 @@
-package martians
+package martians.running
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import martians.at
 import martians.domain.LeaveScent
 import martians.domain.Position
+import martians.grid5x3
 import java.util.concurrent.ConcurrentHashMap
 
 class SurfaceTest : FunSpec({

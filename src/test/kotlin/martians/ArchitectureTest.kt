@@ -11,10 +11,26 @@ class ArchitectureTest : FunSpec({
         .withImportOption(ImportOption.DoNotIncludeTests())
         .importPackages("martians")
 
-    test("the domain depends on nothing outside the domain, apart from the Kotlin and Java runtimes") {
-        classes().that().resideInAPackage("martians.domain..")
-            .should().onlyDependOnClassesThat()
-            .resideInAnyPackage("martians.domain..", "kotlin..", "java..", "org.jetbrains.annotations..")
+    val runtime = arrayOf("kotlin..", "java..", "org.jetbrains.annotations..")
+
+    fun packageDependsOnlyOn(subject: String, vararg allowed: String) =
+        classes().that().resideInAPackage(subject)
+            .should().onlyDependOnClassesThat().resideInAnyPackage(subject, *allowed, *runtime)
             .check(productionClasses)
+
+    test("the domain depends on nothing else in the project") {
+        packageDependsOnlyOn("martians.domain..")
+    }
+
+    test("commands depend only on the domain") {
+        packageDependsOnlyOn("martians.commands..", "martians.domain..")
+    }
+
+    test("parsing depends only on the domain") {
+        packageDependsOnlyOn("martians.parsing..", "martians.domain..")
+    }
+
+    test("running depends only on the domain") {
+        packageDependsOnlyOn("martians.running..", "martians.domain..")
     }
 })

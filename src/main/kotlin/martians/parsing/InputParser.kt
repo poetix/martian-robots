@@ -6,8 +6,6 @@ import martians.domain.RobotProgram
 
 class InputException(message: String) : IllegalArgumentException(message)
 
-data class Mission(val bounds: GridBounds, val robots: List<RobotProgram>)
-
 /**
  * Parses the problem input: a grid line, then a position line and an instruction line per robot.
  * An empty instruction line means a robot with no instructions.
@@ -32,10 +30,5 @@ class InputParser(private val commandResolver: (Char) -> Command?) {
         }.constrainOnce()
 
         return consume(gridBounds, programs)
-    }
-
-    /** Parses the whole of [input] into memory, splitting lines exactly as a line reader over a stream would. */
-    fun parse(input: String): Mission = parse(input.reader().buffered().lineSequence()) { bounds, programs ->
-        Mission(bounds, programs.toList())
     }
 }

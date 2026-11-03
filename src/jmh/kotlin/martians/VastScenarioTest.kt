@@ -4,11 +4,12 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeUnique
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import martians.running.SequentialMissionRunner
 
 class VastScenarioTest : FunSpec({
 
     val scenario = VastScenario(size = 1_000, robotCount = 10_000)
-    val finished = MartianRobots.execute(scenario.programs.asSequence(), scenario.safeSquares).toList()
+    val finished = SequentialMissionRunner.run(scenario.programs.asSequence(), scenario.safeSquares).toList()
 
     test("about one point in sixteen is a hole") {
         val sample = (0 until 400).flatMap { x -> (0 until 400).map { y -> x at y } }
@@ -25,6 +26,6 @@ class VastScenarioTest : FunSpec({
 
     test("the same seed gives the same outcome") {
         val again = VastScenario(size = 1_000, robotCount = 10_000)
-        MartianRobots.execute(again.programs.asSequence(), again.safeSquares).toList() shouldBe finished
+        SequentialMissionRunner.run(again.programs.asSequence(), again.safeSquares).toList() shouldBe finished
     }
 })
