@@ -46,4 +46,10 @@ class MartianRobotsTest : FunSpec({
 
         run(input) shouldBe expected
     }
+
+    test("stray whitespace and blank lines between robots do not change the output") {
+        val input = "\n5 3  \n1 1 E\nRFRFRFRF \n\n  3 2 N\nFRRFLLFFRRFLL\n\n\n0 3 W\nLLFFFLFLFL\n \n"
+
+        run(input) shouldBe "1 1 E\n3 3 N LOST\n2 3 S"
+    }
 })

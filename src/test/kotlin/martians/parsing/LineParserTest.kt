@@ -100,6 +100,37 @@ class LineParserTest : FunSpec({
         }
     }
 
+    context("whitespace and blank lines") {
+        test("every line is trimmed") {
+            val parser = parsing("  5 3 ", "\t1 1 E  ", " RF\t")
+            parser.parseGridBounds() shouldBe grid5x3
+            parser.parseProgram(grid5x3) shouldBe RobotProgram(RobotState(1 at 1, E), listOf(TurnRight, Forward))
+        }
+
+        test("blank lines before the grid and before a robot are skipped") {
+            val parser = parsing("", "5 3", "", "  ", "1 1 E", "F")
+            parser.parseGridBounds() shouldBe grid5x3
+            parser.parseProgram(grid5x3) shouldBe RobotProgram(RobotState(1 at 1, E), listOf(Forward))
+        }
+
+        test("a blank line after a robot's position is its instructions, not skipped") {
+            parsing("1 1 E", "  ", "F").parseProgram(grid5x3) shouldBe RobotProgram(RobotState(1 at 1, E), emptyList())
+        }
+
+        test("there are more programs only if a non-blank line remains") {
+            parsing().hasMorePrograms() shouldBe false
+            parsing("", " \t").hasMorePrograms() shouldBe false
+            parsing("", "1 1 E").hasMorePrograms() shouldBe true
+        }
+
+        test("skipped blank lines are counted in line numbers") {
+            val parser = parsing("5 3", "", "", "1 1 Q", "F")
+            val bounds = parser.parseGridBounds()
+            shouldThrow<InputException> { parser.parseProgram(bounds) }
+                .message shouldBe "Line 4: 'Q' is not an orientation; expected one of N, E, S, W"
+        }
+    }
+
     context("errors name the line they occur on") {
         test("lines are counted across everything parsed so far") {
             val parser = parsing("5 3", "1 1 E", "F", "1 1 Q", "F")

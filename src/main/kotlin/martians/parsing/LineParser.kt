@@ -9,15 +9,23 @@ import martians.domain.RobotState
 
 /**
  * Takes input lines one at a time, numbering them so that every failure can say which line it is on.
- * Each `parse` method consumes exactly one line, except [parseProgram], which consumes a robot's two.
+ * Every line is trimmed. Blank lines are skipped, except the line after a robot's position, where a blank line
+ * means a robot with no instructions. Each `parse` method consumes one non-blank line, except [parseInstructions],
+ * which consumes the next line whether blank or not, and [parseProgram], which consumes a robot's two.
  */
 internal class LineParser(
     private val iterator: Iterator<String>,
     private val commandResolver: (Char) -> Command?,
 ) {
+    /** The number of the last line taken; skipped blank lines are counted. */
     private var lineNumber = 0
+    private var peeked: String? = null
 
-    fun hasMore(): Boolean = iterator.hasNext()
+    /** Whether any non-blank line remains, which can only be the start of another program. */
+    fun hasMorePrograms(): Boolean {
+        skipBlankLines()
+        return peek() != null
+    }
 
     fun parseGridBounds(): GridBounds =
         takeAndParse("grid size") { line ->
@@ -47,7 +55,7 @@ internal class LineParser(
         }
 
     fun parseInstructions(): List<Command> =
-        takeAndParse("robot instructions") { line ->
+        takeAndParse("robot instructions", skipBlank = false) { line ->
             if (line.length > MAX_INSTRUCTION_LENGTH) {
                 fail("Instructions are ${line.length} characters; at most $MAX_INSTRUCTION_LENGTH allowed")
             }
@@ -65,14 +73,31 @@ internal class LineParser(
         return value
     }
 
-    private fun <T> takeAndParse(expected: String, parse: (String) -> T): T {
+    private fun <T> takeAndParse(expected: String, skipBlank: Boolean = true, parse: (String) -> T): T {
+        if (skipBlank) skipBlankLines()
+        val line = take() ?: run {
+            lineNumber += 1
+            fail("Expected $expected but reached end of input")
+        }
+        return parse(line)
+    }
+
+    private fun peek(): String? {
+        if (peeked == null && iterator.hasNext()) peeked = iterator.next().trim()
+        return peeked
+    }
+
+    private fun take(): String? = peek()?.also {
+        peeked = null
         lineNumber += 1
-        if (!iterator.hasNext()) fail("Expected $expected but reached end of input")
-        return parse(iterator.next())
+    }
+
+    private fun skipBlankLines() {
+        while (peek()?.isEmpty() == true) take()
     }
 
     private fun String.takeFields(count: Int, description: String): List<String> {
-        val fields = trim().split(WHITESPACE)
+        val fields = split(WHITESPACE)
         if (fields.size != count) fail("Expected $description but got '$this'")
         return fields
     }

@@ -109,14 +109,15 @@ Design decisions and trade-offs are in [ARCHITECTURE.md](ARCHITECTURE.md).
   the grid is an input error.
 - **The brief's limits are enforced.** Coordinates must be whole numbers from
   0 to 50, and instruction lines at most 99 characters.
-- **Input is strict:**
-  - letters must be upper case (`N`, `E`, `S`, `W`; `L`, `R`, `F`);
+- **Whitespace:**
+  - leading and trailing whitespace on every line is ignored;
   - any run of spaces or tabs separates the fields on grid and position lines;
-  - instruction lines may not contain spaces.
+  - instruction lines may not contain spaces between letters.
+- **Letters must be upper case:** `N`, `E`, `S`, `W`; `L`, `R`, `F`.
 - **Blank lines:**
-  - an empty instruction line means a robot with no instructions, which is
-    reported where it started;
-  - a blank line where a position is expected is an error.
+  - a blank line straight after a robot's position is its instruction line:
+    the robot has no instructions and is reported where it started;
+  - any other blank line is skipped.
 - **Line endings:** a final line terminator does not start an extra line, and
   `\n` and `\r\n` are both accepted.
 - **The first error stops the run.** Earlier robots have already been reported;
