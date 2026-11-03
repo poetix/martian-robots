@@ -26,16 +26,11 @@ class GeometryTest : FunSpec({
         }
     }
 
-    context("moving one step in each orientation") {
-        withData(
-            nameFn = { (orientation, to) -> "$orientation moves to $to" },
-            N to (2 at 2),
-            E to (3 at 1),
-            S to (2 at 0),
-            W to (1 at 1),
-        ) { (orientation, to) ->
-            (2 at 1).moved(orientation) shouldBe to
-        }
+    test("moving one step in each orientation") {
+        (2 at 2).moved(N) shouldBe (2 at 3)
+        (2 at 2).moved(E) shouldBe (3 at 2)
+        (2 at 2).moved(S) shouldBe (2 at 1)
+        (2 at 2).moved(W) shouldBe (1 at 2)
     }
 
     context("grid bounds include their edges and exclude everything beyond") {
