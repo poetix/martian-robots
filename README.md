@@ -41,7 +41,7 @@ JDK 17 or later:
 build/install/martian-robots/bin/martian-robots < input.txt
 ```
 
-## Tests, guardrails and decision records
+## Tests and guardrails
 
 Some of what is in this repository is more than a program this size needs. It
 is there because it is part of how I work with AI coding tools, and I have left
@@ -69,22 +69,16 @@ so I don't rely on it to have followed a rule or to have tested what it claims
 to have tested.
 
 - **Architecture rules.** `ArchitectureTest` uses ArchUnit to enforce the
-  dependency rules between packages set out in
-  [ADR 0003](docs/adrs/0003-package-structure.md). If a change reaches across a
-  package boundary, the build fails.
+  dependency rules between the packages in the [Structure](#structure) table.
+  If a change reaches across a package boundary, the build fails.
 - **Mutation testing.** PIT makes small changes to the code, such as flipping a
   comparison or dropping a call, and reports any change that no test catches.
   Assistants readily write tests that pass but check little. PIT shows where
   that has happened, and I strengthen the tests until those changes are caught.
 
-### Decision records
-
-[`docs/adrs/`](docs/adrs/) holds architecture decision records. Each decision
-ends with a one-paragraph Y-statement: the choice, the alternatives rejected
-and the trade-off accepted. These are working records. They are how I keep
-track of decisions and keep an AI assistant consistent with them from one
-session to the next. Being AI generated, they are not intended as exemplary of the documentation style I would adopt for review by human beings. The decisions that
-matter for this submission are summarised in this README.
+I keep decision records while building and used them to hold the assistant to
+earlier choices; the standing decisions are in
+[ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Structure
 
@@ -117,6 +111,8 @@ The main extension points:
   `SequentialMissionRunner`.
 
 `ArchitectureTest` checks the dependency rules between packages.
+
+Design decisions and trade-offs are in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Assumptions
 
