@@ -76,7 +76,7 @@ to have tested.
   Assistants readily write tests that pass but check little. PIT shows where
   that has happened, and I strengthen the tests until those changes are caught.
 
-I keep decision records while building and used them to hold the assistant to
+I keep decision records while building and use them to hold the assistant to
 earlier choices; the standing decisions are in
 [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -89,28 +89,6 @@ earlier choices; the standing decisions are in
 | `martians.commands` | The instructions: `TurnLeft`, `TurnRight`, `Forward`, and `standardCommands`, which maps letters to commands. |
 | `martians.parsing` | `InputParser` streams robots from lines of input; `LineParser` parses one line at a time and puts the line number in every error. |
 | `martians.running` | `RobotStepper` steps one robot through its commands. `SequentialMissionRunner` runs robots one after another. `Surface` holds the scents left so far. |
-
-How a run works:
-
-1. `InputParser` reads the grid, then hands over the robots as a lazy sequence
-   of `RobotProgram`s.
-2. `SequentialMissionRunner` runs each program against one `Surface`, using
-   `RobotStepper`.
-3. Each command takes a robot and its `Environment`, which says whether a
-   square is safe and whether a point has a scent. It returns an `Outcome`:
-   the new robot state, plus any `Effect`s such as `LeaveScent`. Commands never
-   change anything themselves; the runner applies their effects to the
-   `Surface`.
-4. Each robot's final state is printed as soon as it is known.
-
-The main extension points:
-
-- **New command:** implement `Command` and add it to `standardCommands`.
-- **New terrain:** a `SafeSquares` other than `GridBounds`.
-- **New way of running robots,** such as in parallel: a sibling of
-  `SequentialMissionRunner`.
-
-`ArchitectureTest` checks the dependency rules between packages.
 
 Design decisions and trade-offs are in [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -130,8 +108,7 @@ Design decisions and trade-offs are in [ARCHITECTURE.md](ARCHITECTURE.md).
 - **Robots must start on the grid.** A robot whose starting position is off
   the grid is an input error.
 - **The brief's limits are enforced.** Coordinates must be whole numbers from
-  0 to 50, and instruction lines at most 99 characters. They are checked by the
-  parser only; the domain itself has no size limits.
+  0 to 50, and instruction lines at most 99 characters.
 - **Input is strict:**
   - letters must be upper case (`N`, `E`, `S`, `W`; `L`, `R`, `F`);
   - any run of spaces or tabs separates the fields on grid and position lines;
