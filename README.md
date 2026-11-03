@@ -10,8 +10,7 @@ Kotlin 2.4 targeting JVM 17, built with Gradle and tested with Kotest.
 
 ## Building and running
 
-You need a JDK 17 or later. Gradle builds with JDK 17, downloading it if it is
-not installed.
+You need a JDK 17 or later. Gradle builds with whichever JDK it runs on.
 
 ```sh
 ./gradlew build                      # compile and run the tests
@@ -43,10 +42,6 @@ build/install/martian-robots/bin/martian-robots < input.txt
 
 ## Tests and guardrails
 
-Some of what is in this repository is more than a program this size needs. It
-is there because it is part of how I work with AI coding tools, and I have left
-it in rather than strip it out for submission.
-
 | Command | What it does |
 |---|---|
 | `./gradlew test` | Unit, integration, CLI and architecture tests |
@@ -63,10 +58,9 @@ because of a scent.
 
 ### Guardrails
 
-A program this size needs neither of these tools. I use them as deterministic
-guardrails when working with an AI assistant: they check its work mechanically,
-so I don't rely on it to have followed a rule or to have tested what it claims
-to have tested.
+I use ArchUnit and PIT as deterministic guardrails when working with an AI
+assistant: they check its work mechanically, so I don't rely on it to have
+followed a rule or to have tested what it claims to have tested.
 
 - **Architecture rules.** `ArchitectureTest` uses ArchUnit to enforce the
   dependency rules between the packages in the [Structure](#structure) table.
