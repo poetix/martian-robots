@@ -172,13 +172,7 @@ change:
   edges, a cube-shaped world or sliding on ice would need
   `Forward` to ask the terrain for the next position and orientation instead.
 - **A parallel runner.** Robots run in parallel see scents in whatever order
-  they are laid, which breaks the brief's strict ordering. To keep the brief's
-  results:
-  - run every robot in parallel with no scents;
-  - then go through them in input order, re-running only those that met a
-    scent left by an earlier robot.
-
-  `RobotStepper` and `Surface` already support this.
+  they are laid, which breaks the brief's strict ordering.
 - **Robots moving together, one instruction per tick,** with collisions. This
   needs a runner that interleaves robots tick by tick. Effects are returned as
   data, so a tick's effects can be gathered and conflicts resolved before
