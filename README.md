@@ -41,33 +41,58 @@ JDK 17 or later:
 build/install/martian-robots/bin/martian-robots < input.txt
 ```
 
-### Tests and other checks
+## Tests, guardrails and decision records
+
+Some of what is in this repository is more than a program this size needs. It
+is there because it is part of how I work with AI coding tools, and I have left
+it in rather than strip it out for submission.
 
 | Command | What it does |
 |---|---|
 | `./gradlew test` | Unit, integration, CLI and architecture tests |
 | `./gradlew pitest` | Mutation testing with PIT; report in `build/reports/pitest/index.html` |
-| `./gradlew benchmarkScenarioTest` | Checks the large benchmark scenario behaves correctly |
-| `./gradlew jmh` | Runs the JMH benchmark (after `benchmarkScenarioTest`) |
 
-To run the benchmark with profilers, use the instructions in
-[benchmark 0001](docs/benchmarks/0001-vast-scenario.md#how-to-run).
+### Tests
 
-## Documentation
+Each package has its own unit tests. `MartianRobotsTest` runs whole inputs,
+including the sample from the brief, through parsing and execution. `CliTest`
+checks standard output, error messages and the exit status. The edge cases from
+the brief are tested for a single command in `CommandsTest` and across robots
+in `MartianRobotsTest`: lost robots, the scent they leave, and moves ignored
+because of a scent.
 
-- [`docs/adrs/`](docs/adrs/): architecture decision records. Each decision
-  ends with a one-paragraph Y-statement: the choice, the alternatives rejected
-  and the trade-off accepted.
-  - [0001 Overall design](docs/adrs/0001-overall-design.md): the original
-    design, including parsing, validation and input limits. Some sections are
-    superseded by 0002.
-  - [0002 Commands address robots, not the world](docs/adrs/0002-robot-addressed-commands.md):
-    commands, effects and environments, and why robots could run in parallel.
-  - [0003 Package structure](docs/adrs/0003-package-structure.md): the
-    packages and the dependency rules between them.
-- [`docs/benchmarks/0001-vast-scenario.md`](docs/benchmarks/0001-vast-scenario.md):
-  benchmark and profile of a very large field with 100,000 robots, including
-  the experiments tried and the recommendations made.
+### Guardrails
+
+A program this size needs neither of these tools. I use them as deterministic
+guardrails when working with an AI assistant: they check its work mechanically,
+so I don't rely on it to have followed a rule or to have tested what it claims
+to have tested.
+
+- **Architecture rules.** `ArchitectureTest` uses ArchUnit to enforce the
+  dependency rules between packages set out in
+  [ADR 0003](docs/adrs/0003-package-structure.md). If a change reaches across a
+  package boundary, the build fails.
+- **Mutation testing.** PIT makes small changes to the code, such as flipping a
+  comparison or dropping a call, and reports any change that no test catches.
+  Assistants readily write tests that pass but check little. PIT shows where
+  that has happened, and I strengthen the tests until those changes are caught.
+
+### Decision records
+
+[`docs/adrs/`](docs/adrs/) holds architecture decision records. Each decision
+ends with a one-paragraph Y-statement: the choice, the alternatives rejected
+and the trade-off accepted. These are working records. They are how I keep
+track of decisions and keep an AI assistant consistent with them from one
+session to the next. They are not written for a reader. The decisions that
+matter for this submission are summarised in this README.
+
+- [0001 Overall design](docs/adrs/0001-overall-design.md): the original design,
+  including parsing, validation and input limits. Some sections are superseded
+  by 0002.
+- [0002 Commands address robots, not the world](docs/adrs/0002-robot-addressed-commands.md):
+  commands, effects and environments, and why robots could run in parallel.
+- [0003 Package structure](docs/adrs/0003-package-structure.md): the packages
+  and the dependency rules between them.
 
 ## Structure
 
@@ -153,8 +178,7 @@ change:
   - then go through them in input order, re-running only those that met a
     scent left by an earlier robot.
 
-  `RobotStepper` and `Surface` already support this (see
-  [benchmark 0001](docs/benchmarks/0001-vast-scenario.md#recommendations)).
+  `RobotStepper` and `Surface` already support this.
 - **Robots moving together, one instruction per tick,** with collisions. This
   needs a runner that interleaves robots tick by tick. Effects are returned as
   data, so a tick's effects can be gathered and conflicts resolved before

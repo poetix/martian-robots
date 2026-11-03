@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.pitest)
-    alias(libs.plugins.jmh)
     application
 }
 
@@ -40,21 +39,4 @@ pitest {
     outputFormats = setOf("HTML", "XML")
     timestampedReports = false
     excludedMethods = setOf("main")
-}
-
-jmh {
-    jmhVersion = libs.versions.jmh.get()
-    includeTests = true
-}
-
-val benchmarkScenarioTest by tasks.registering(Test::class) {
-    description = "Checks that the benchmark scenarios behave correctly."
-    group = "verification"
-    testClassesDirs = sourceSets["jmh"].output.classesDirs
-    classpath = sourceSets["jmh"].runtimeClasspath
-    useJUnitPlatform()
-}
-
-tasks.named("jmh") {
-    dependsOn(benchmarkScenarioTest)
 }

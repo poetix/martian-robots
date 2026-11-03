@@ -119,10 +119,7 @@ would be a sibling of `SequentialMissionRunner`, stepping robots with
 
 - Commands are tested as `execute(robot, environment) shouldBe Outcome(...)`,
   and programs as robot before, robot after and effects produced.
-- No `WorldState` is allocated per command. In
-  [benchmark 0001](../benchmarks/0001-vast-scenario.md)'s scenario, the 1G
-  field dropped from about 86 ms to 71 ms and allocation fell by about 10%. The
-  1k field was within noise (94 ± 8 ms against 96 ± 2 ms).
+- No `WorldState` is allocated per command.
 - `kotlinx-collections-immutable` is no longer needed and has been removed.
 
 **Negative / costs**
@@ -132,7 +129,7 @@ would be a sibling of `SequentialMissionRunner`, stepping robots with
   robots before it. Robots run concurrently on a shared concurrent set see
   whatever scents happen to have been laid when they look, so results would
   depend on timing. A parallel runner that must keep the brief's rules needs
-  reconciliation, such as benchmark 0001 recommendation 2: run every robot in
+  reconciliation, for example: run every robot in
   parallel, then re-run in order only the robots that met a scent.
   `RobotStepper` can step each robot for such a runner, but the runner itself
   is not built.

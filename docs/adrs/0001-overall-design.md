@@ -137,9 +137,7 @@ to `Forward`.
 
 `scents` is a `PersistentSet<Position>` from `kotlinx-collections-immutable`,
 created with `persistentHashSetOf()`. The library's default `persistentSetOf()`
-keeps insertion order, which we never use, and
-[benchmark 0001](../benchmarks/0001-vast-scenario.md) measured it as about 7%
-slower and 16% more allocation-heavy.
+keeps insertion order, which we never use.
 `Forward` records a scent with `scents.adding(position)`, which costs O(log n)
 and shares structure with the previous world. We call `adding` explicitly.
 Without an extra import, `scents + position` resolves to the standard library's
@@ -251,9 +249,8 @@ when constructed. We chose not to.
 
 The limits describe what Earth will send, not how robots behave on Mars. No
 rule of movement, loss or scent depends on 50 or 99. Keeping the domain
-unbounded is what lets [benchmark 0001](../benchmarks/0001-vast-scenario.md)
-build a field a billion points across directly. It also leaves room for a
-future rule change that raises or removes the limits.
+unbounded leaves room for a future rule change that raises or removes the
+limits.
 
 > In the context of **the brief's input limits (coordinates ≤ 50, instructions
 > < 100 characters)**, facing **the choice of where to enforce them**, we
@@ -261,7 +258,7 @@ future rule change that raises or removes the limits.
 > to construct `GridBounds`, `Position` or `RobotProgram` values beyond them**,
 > to achieve **a domain that models movement, loss and scent at any size, with
 > the limits kept alongside the input format they describe**, accepting **that
-> code constructing domain objects directly, such as tests and benchmarks, is
+> code constructing domain objects directly, such as tests, is
 > not held to the brief's limits**.
 
 ## Consequences
