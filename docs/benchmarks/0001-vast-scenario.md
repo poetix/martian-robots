@@ -68,7 +68,7 @@ a hole, so roughly half the robots are lost.
 java -jar build/libs/martian-robots-jmh.jar VastScenarioBenchmark -prof gc
 ```
 
-Run the jar with a JDK 25 `java` (Gradle's toolchain JDK will do).
+Run the jar with any JDK 17 or later.
 
 The scenario and its test live in the `jmh` source set, so `./gradlew test`
 does not run them. Run `./gradlew benchmarkScenarioTest` to check the scenario

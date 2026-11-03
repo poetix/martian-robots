@@ -6,12 +6,12 @@ stops later robots falling off at the same point. This program reads a grid and
 a list of robots, runs the robots one after another, and prints where each one
 ends up.
 
-Kotlin 2.4 on JVM 25, built with Gradle and tested with Kotest.
+Kotlin 2.4 targeting JVM 17, built with Gradle and tested with Kotest.
 
 ## Building and running
 
-You need a JDK (17 or later) to start Gradle. Gradle downloads JDK 25 itself
-if it is not installed.
+You need a JDK 17 or later. Gradle builds with JDK 17, downloading it if it is
+not installed.
 
 ```sh
 ./gradlew build                      # compile and run the tests
@@ -33,8 +33,8 @@ for example `Invalid input: Line 2: 'Q' is not an orientation; expected one of
 N, E, S, W`, and the exit status is 1. Input is streamed, so robots before the
 bad line have already been reported.
 
-To run without Gradle, build a distribution and run its script with
-`JAVA_HOME` set to a JDK 25:
+To run without Gradle, build a distribution and run its script with any
+JDK 17 or later:
 
 ```sh
 ./gradlew installDist

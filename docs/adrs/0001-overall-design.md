@@ -28,7 +28,9 @@ build any of them ahead of need.
 
 Constraints:
 
-- Kotlin on JVM 25, Gradle, Kotest.
+- Kotlin on JVM 17, Gradle, Kotest. (Amended 2026-11-03: originally JVM 25;
+  lowered to 17, the oldest JDK Gradle supports, so the build and the
+  installed script run on any current JDK.)
 - Run from a fresh clone with only a JDK able to launch Gradle; the toolchain
   is provisioned automatically.
 - Coordinates are at most 50; instruction strings are under 100 characters.
