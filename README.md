@@ -83,16 +83,8 @@ to have tested.
 ends with a one-paragraph Y-statement: the choice, the alternatives rejected
 and the trade-off accepted. These are working records. They are how I keep
 track of decisions and keep an AI assistant consistent with them from one
-session to the next. They are not written for a reader. The decisions that
+session to the next. They are not written for a reader, and (being AI generated) are not intended as exemplary of the documentation style I would adopt for review by human beings. The decisions that
 matter for this submission are summarised in this README.
-
-- [0001 Overall design](docs/adrs/0001-overall-design.md): the original design,
-  including parsing, validation and input limits. Some sections are superseded
-  by 0002.
-- [0002 Commands address robots, not the world](docs/adrs/0002-robot-addressed-commands.md):
-  commands, effects and environments, and why robots could run in parallel.
-- [0003 Package structure](docs/adrs/0003-package-structure.md): the packages
-  and the dependency rules between them.
 
 ## Structure
 
