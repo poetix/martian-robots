@@ -27,12 +27,14 @@ internal class LineParser(
         return peek() != null
     }
 
+    /** Parses the grid line: the upper-right coordinates of a grid whose lower-left is `0 0`. */
     fun parseGridBounds(): GridBounds =
         takeAndParse("grid size") { line ->
             val (xCoordinate, yCoordinate) = line.takeFields(2, "grid size as 'x y'")
             GridBounds.fromOriginTo(parsePosition(xCoordinate, yCoordinate))
         }
 
+    /** Parses a robot's position line and instruction line; the robot must start within [gridBounds]. */
     fun parseProgram(gridBounds: GridBounds): RobotProgram =
         RobotProgram(
             parseRobotState().also { start ->
@@ -57,7 +59,7 @@ internal class LineParser(
     private fun parseInstructions(): List<Command> =
         takeAndParse("robot instructions", skipBlank = false) { line ->
             if (line.length > MAX_INSTRUCTION_LENGTH) {
-                fail("Instructions are ${line.length} characters; at most $MAX_INSTRUCTION_LENGTH allowed")
+                fail("instructions are ${line.length} characters; at most $MAX_INSTRUCTION_LENGTH allowed")
             }
             line.map { letter ->
                 commandResolver(letter) ?: fail("'$letter' is not a known instruction")
@@ -69,16 +71,13 @@ internal class LineParser(
 
     private fun parseCoordinate(field: String): Int {
         val value = field.toIntOrNull() ?: fail("'$field' is not a whole number")
-        if (value !in 0..MAX_COORDINATE) fail("Coordinate $value is outside 0..$MAX_COORDINATE")
+        if (value !in 0..MAX_COORDINATE) fail("coordinate $value is outside 0..$MAX_COORDINATE")
         return value
     }
 
     private fun <T> takeAndParse(expected: String, skipBlank: Boolean = true, parse: (String) -> T): T {
         if (skipBlank) skipBlankLines()
-        val line = take() ?: run {
-            lineNumber += 1
-            fail("Expected $expected but reached end of input")
-        }
+        val line = take() ?: fail("expected $expected but reached end of input", line = lineNumber + 1)
         return parse(line)
     }
 
@@ -98,11 +97,11 @@ internal class LineParser(
 
     private fun String.takeFields(count: Int, description: String): List<String> {
         val fields = split(WHITESPACE)
-        if (fields.size != count) fail("Expected $description but got '$this'")
+        if (fields.size != count) fail("expected $description but got '$this'")
         return fields
     }
 
-    private fun fail(message: String): Nothing = throw InputException("Line $lineNumber: $message")
+    private fun fail(message: String, line: Int = lineNumber): Nothing = throw InputException("Line $line: $message")
 
     companion object {
         const val MAX_COORDINATE = 50

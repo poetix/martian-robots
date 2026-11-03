@@ -26,6 +26,7 @@ enum class Orientation(val movesX: Int, val movesY: Int) {
 
     /** The orientation 90 degrees anticlockwise from this one. */
     fun left(): Orientation = entries[(ordinal + entries.size - 1) % entries.size]
+
     /** The orientation 90 degrees clockwise from this one. */
     fun right(): Orientation = entries[(ordinal + 1) % entries.size]
 }
@@ -54,6 +55,6 @@ data class GridBounds(val bottomLeft: Position, val topRight: Position) : SafeSq
 
     companion object {
         /** The grid from `0 0` to [topRight], as the brief's input describes it. */
-        fun fromOriginTo(topRight: Position) = GridBounds(Position(0, 0), topRight)
+        fun fromOriginTo(topRight: Position): GridBounds = GridBounds(Position(0, 0), topRight)
     }
 }

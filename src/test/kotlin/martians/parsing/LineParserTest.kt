@@ -20,7 +20,8 @@ import martians.robot
 
 class LineParserTest : FunSpec({
 
-    fun parsing(vararg lines: String) = LineParser(lines.iterator(), standardCommands::get)
+    fun parsing(vararg lines: String, resolver: (Char) -> Command? = standardCommands::get) =
+        LineParser(lines.iterator(), resolver)
 
     context("grid bounds") {
         test("upper-right coordinates give bounds from 0 0") {
@@ -60,7 +61,7 @@ class LineParserTest : FunSpec({
 
     context("instructions") {
         fun commands(instructionLine: String, resolver: (Char) -> Command? = standardCommands::get) =
-            LineParser(listOf("1 1 E", instructionLine).iterator(), resolver).parseProgram(grid5x3).commands
+            parsing("1 1 E", instructionLine, resolver = resolver).parseProgram(grid5x3).commands
 
         test("each letter becomes a command") {
             commands("LRF") shouldBe listOf(TurnLeft, TurnRight, Forward)
@@ -149,12 +150,12 @@ class LineParserTest : FunSpec({
             val parser = parsing("5 3", "1 1 E")
             val bounds = parser.parseGridBounds()
             shouldThrow<InputException> { parser.parseProgram(bounds) }
-                .message shouldBe "Line 3: Expected robot instructions but reached end of input"
+                .message shouldBe "Line 3: expected robot instructions but reached end of input"
         }
 
         test("no input at all is missing line 1") {
             shouldThrow<InputException> { parsing().parseGridBounds() }
-                .message shouldBe "Line 1: Expected grid size but reached end of input"
+                .message shouldBe "Line 1: expected grid size but reached end of input"
         }
     }
 })

@@ -48,6 +48,7 @@ class MartianRobotsTest : FunSpec({
     }
 
     test("stray whitespace and blank lines between robots do not change the output") {
+        // Escaped rather than a trimIndent() block, which would strip the whitespace under test.
         val input = "\n5 3  \n1 1 E\nRFRFRFRF \n\n  3 2 N\nFRRFLLFFRRFLL\n\n\n0 3 W\nLLFFFLFLFL\n \n"
 
         run(input) shouldBe "1 1 E\n3 3 N LOST\n2 3 S"
