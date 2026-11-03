@@ -83,7 +83,7 @@ to have tested.
 ends with a one-paragraph Y-statement: the choice, the alternatives rejected
 and the trade-off accepted. These are working records. They are how I keep
 track of decisions and keep an AI assistant consistent with them from one
-session to the next. They are not written for a reader, and (being AI generated) are not intended as exemplary of the documentation style I would adopt for review by human beings. The decisions that
+session to the next. Being AI generated, they are not intended as exemplary of the documentation style I would adopt for review by human beings. The decisions that
 matter for this submission are summarised in this README.
 
 ## Structure
